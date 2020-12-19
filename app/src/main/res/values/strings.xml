@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">My Application</string>
-    <string name="play">Play</string>
+    <string name="app_name">Book downloader</string>
+    <string name="search">Search</string>
 </resources>
