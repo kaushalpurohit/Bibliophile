@@ -1,8 +1,13 @@
 package com.example.myapplication;
 
-import android.os.Looper;
+import android.app.DownloadManager;
+import android.database.Cursor;
+import android.net.Uri;
+import java.util.concurrent.TimeUnit;
+import java.io.File;
 import android.util.Log;
 import android.view.Gravity;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.widget.ImageView;
@@ -10,18 +15,14 @@ import android.content.Context;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.animation.AnimationSet;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.squareup.picasso.Picasso;
-
+import okhttp3.OkHttpClient.Builder;
 import org.json.JSONObject;
-
 import java.io.IOException;
-
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -33,6 +34,7 @@ public class PopUp {
     private String image;
     private String title;
     private Context mContext;
+    private long downloadID;
 
     //PopupWindow display method
     public PopUp(Context c, String i, String t, String url) {
@@ -77,7 +79,11 @@ public class PopUp {
             @Override
             public void onClick(View v) {
                 String apiUrl = "https://bookdl-api.herokuapp.com/download?url=" + url;
-                OkHttpClient client = new OkHttpClient();
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .connectTimeout(30, TimeUnit.SECONDS)
+                        .writeTimeout(30,TimeUnit.SECONDS)
+                        .readTimeout(30,TimeUnit.SECONDS)
+                        .build();
                 Request request = new Request.Builder()
                         .url(apiUrl)
                         .build();
@@ -94,9 +100,7 @@ public class PopUp {
                                 JSONObject res = (new JSONObject(myResponse));
                                 String newUrl = res.getString("link");
                                 Log.i("URL", newUrl);
-                                Looper.prepare();
-                                Toast.makeText(view.getContext(), "Downloading your book.", Toast.LENGTH_SHORT).show();
-                                Looper.loop();
+                                beginDownload(newUrl);
                             }
                             catch (Exception e){
                                 Log.i("exception", "1", e);
@@ -120,5 +124,59 @@ public class PopUp {
                 return true;
             }
         });
+    }
+
+    private void beginDownload(String url){
+        String fileName = url.substring(url.lastIndexOf('=') + 1);
+        fileName = fileName.substring(0,1).toUpperCase() + fileName.substring(1);
+        fileName = "/storage/emulated/0/Download/Download.pdf";
+        File file = new File(fileName);
+        Log.i("file", fileName);
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url))
+                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)// Visibility of the download Notification
+                .setDestinationUri(Uri.fromFile(file))// Uri of the destination file
+                .setTitle(fileName)// Title of the Download Notification
+                .setDescription("Downloading")// Description of the Download Notification
+                .setAllowedOverMetered(true)// Set if download is allowed on Mobile network
+                .setAllowedOverRoaming(true);// Set if download is allowed on roaming network
+        DownloadManager downloadManager= (DownloadManager) mContext.getSystemService(mContext.DOWNLOAD_SERVICE);
+        downloadID = downloadManager.enqueue(request);// enqueue puts the download request in the queue.
+
+        // using query method
+        boolean finishDownload = false;
+        int progress;
+        while (!finishDownload) {
+            Cursor cursor = downloadManager.query(new DownloadManager.Query().setFilterById(downloadID));
+            if (cursor.moveToFirst()) {
+                int status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
+                switch (status) {
+                    case DownloadManager.STATUS_FAILED: {
+                        finishDownload = true;
+                        break;
+                    }
+                    case DownloadManager.STATUS_PAUSED:
+                        break;
+                    case DownloadManager.STATUS_PENDING:
+                        break;
+                    case DownloadManager.STATUS_RUNNING: {
+                        final long total = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+                        if (total >= 0) {
+                            final long downloaded = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+                            progress = (int) ((downloaded * 100L) / total);
+                            // if you use downloadmanger in async task, here you can use like this to display progress.
+                            // Don't forget to do the division in long to get more digits rather than double.
+                            //  publishProgress((int) ((downloaded * 100L) / total));
+                        }
+                        break;
+                    }
+                    case DownloadManager.STATUS_SUCCESSFUL: {
+                        progress = 100;
+                        finishDownload = true;
+                        Toast.makeText(mContext, "Download Completed", Toast.LENGTH_SHORT).show();
+                        break;
+                    }
+                }
+            }
+        }
     }
 }
