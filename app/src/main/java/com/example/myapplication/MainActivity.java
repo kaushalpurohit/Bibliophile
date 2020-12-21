@@ -2,8 +2,10 @@ package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
@@ -34,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         text.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String search) {
+                closeKeyboard();
                 spinner.setVisibility(View.VISIBLE);
                 String url = "https://bookdl-api.herokuapp.com/search?book=" + search;
                 OkHttpClient client = new OkHttpClient();
@@ -68,6 +71,13 @@ public class MainActivity extends AppCompatActivity {
                                         exGrid.setAdapter(adapter);
                                         exGrid.setExpanded(true);
                                         spinner.setVisibility(View.GONE);
+                                        exGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                            @Override
+                                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                                PopUp popup = new PopUp(MainActivity.this, imagesList[position], titlesList[position], linksList.get(position));
+                                                popup.showPopupWindow(view);
+                                            }
+                                        });
                                     }
                                     catch (Exception e){
                                         Log.i("exception", "1", e);
@@ -88,40 +98,30 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    
+    public void closeKeyboard()
+    {
+        // this will give us the view
+        // which is currently focus
+        // in this layout
+        View view = this.getCurrentFocus();
+        InputMethodManager manager = (InputMethodManager) getSystemService(
+                Context.INPUT_METHOD_SERVICE);
+        manager
+                .hideSoftInputFromWindow(
+                        view.getWindowToken(), 0);
 
-    private AdapterView.OnItemClickListener listClick = new AdapterView.OnItemClickListener() {
-      public void onItemClick(AdapterView parent, View v, int position, long id){
-          Log.i("Item:", String.valueOf(position));
-          String url = "https://bookdl-api.herokuapp.com/download?url=" + linksList.get(position);
-          OkHttpClient client = new OkHttpClient();
-          Request request = new Request.Builder()
-                  .url(url)
-                  .build();
-          client.newCall(request).enqueue(new Callback() {
-              @Override
-              public void onFailure(Call call, IOException e) {
-                  e.printStackTrace();
-              }
-              @Override
-              public void onResponse(Call call, Response response) throws IOException {
-                  if (response.isSuccessful()) {
-                      final String myResponse = response.body().string();
-                      MainActivity.this.runOnUiThread(new Runnable() {
-                          @Override
-                          public void run() {
-                              try {
-                                      JSONObject res = (new JSONObject(myResponse));
-                                      String url = res.getString("link");
-                                      Log.i("URL:", url);
-                                  }
-                              catch (Exception e){
-                                  Log.i("exception", "1", e);
-                              }
-                          }
-                      });
-                  }
-              }
-          });
-      }
-    };
+        // if nothing is currently
+        // focus then this will protect
+        // the app from crash
+        if (view != null) {
+
+            // now assign the system
+            // service to InputMethodManager
+            manager
+                    .hideSoftInputFromWindow(
+                            view.getWindowToken(), 0);
+        }
+
+    }
 }
