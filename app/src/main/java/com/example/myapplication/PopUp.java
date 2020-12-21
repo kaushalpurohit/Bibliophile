@@ -10,6 +10,9 @@ import android.content.Context;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.AnimationSet;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,13 +54,12 @@ public class PopUp {
 
         //Make Inactive Items Outside Of PopupWindow
         boolean focusable = true;
-
+        AnimationSet mAnimationSet = new AnimationSet(false);
         //Create a window with our parameters
-        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
-
+        final PopupWindow popupWindow = new PopupWindow(popupView, width, height);
         //Set the location of the window on the screen
+        popupWindow.setAnimationStyle(R.style.fade_in_out);
         popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
-
         //Initialize the elements of our window, install the handler
 
         TextView test2 = popupView.findViewById(R.id.titleText);

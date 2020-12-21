@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    
+
     public void closeKeyboard()
     {
         // this will give us the view

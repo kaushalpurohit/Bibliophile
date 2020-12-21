@@ -8,6 +8,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.AnimationSet;
 import com.squareup.picasso.Picasso;
 
 public class CustomGrid extends BaseAdapter{
@@ -50,7 +53,11 @@ public class CustomGrid extends BaseAdapter{
 
             grid = inflater.inflate(R.layout.grid_single, null);
             TextView textView = (TextView) grid.findViewById(R.id.grid_text);
+            AnimationSet mAnimationSet = new AnimationSet(false);
             ImageView imageView = (ImageView)grid.findViewById(R.id.grid_image);
+            Animation fadeInAnimation = AnimationUtils.loadAnimation(grid.getContext(), android.R.anim.fade_in);
+            fadeInAnimation.setStartOffset(1000);
+            mAnimationSet.addAnimation(fadeInAnimation);
             textView.setText(web[position]);
             Log.i("message", String.valueOf(position));
             Picasso
@@ -58,6 +65,7 @@ public class CustomGrid extends BaseAdapter{
                     .load(Imageid[position])
                     .fit() // will explain later
                     .into(imageView);
+            imageView.startAnimation(mAnimationSet);
         } else {
             grid = (View) convertView;
         }
