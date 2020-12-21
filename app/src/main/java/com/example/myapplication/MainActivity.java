@@ -79,6 +79,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                grid=(GridView)findViewById(R.id.grid);
+                grid.setAdapter(null);
                 return false;
             }
         });
