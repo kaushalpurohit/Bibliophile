@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import java.util.concurrent.TimeUnit;
 import java.io.File;
+
+import android.os.Looper;
 import android.util.Log;
 import android.view.Gravity;
 import android.os.Environment;
@@ -129,18 +131,24 @@ public class PopUp {
     private void beginDownload(String url){
         String fileName = url.substring(url.lastIndexOf('=') + 1);
         fileName = fileName.substring(0,1).toUpperCase() + fileName.substring(1);
-        fileName = "/storage/emulated/0/Download/Download.pdf";
+        fileName = "/storage/emulated/0/Download/the_da_vinci_code.pdf";
         File file = new File(fileName);
         Log.i("file", fileName);
+        Log.i("parse", Uri.parse(url).toString());
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url))
+                .setAllowedNetworkTypes(
+                DownloadManager.Request.NETWORK_WIFI
+                        | DownloadManager.Request.NETWORK_MOBILE)
                 .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)// Visibility of the download Notification
                 .setDestinationUri(Uri.fromFile(file))// Uri of the destination file
                 .setTitle(fileName)// Title of the Download Notification
                 .setDescription("Downloading")// Description of the Download Notification
                 .setAllowedOverMetered(true)// Set if download is allowed on Mobile network
+                .setDestinationUri(Uri.fromFile(file))
                 .setAllowedOverRoaming(true);// Set if download is allowed on roaming network
         DownloadManager downloadManager= (DownloadManager) mContext.getSystemService(mContext.DOWNLOAD_SERVICE);
         downloadID = downloadManager.enqueue(request);// enqueue puts the download request in the queue.
+        Log.i("ID", String.valueOf(downloadID));
 
         // using query method
         boolean finishDownload = false;
@@ -149,6 +157,7 @@ public class PopUp {
             Cursor cursor = downloadManager.query(new DownloadManager.Query().setFilterById(downloadID));
             if (cursor.moveToFirst()) {
                 int status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
+                Log.i("status", String.valueOf(status));
                 switch (status) {
                     case DownloadManager.STATUS_FAILED: {
                         finishDownload = true;
@@ -160,6 +169,7 @@ public class PopUp {
                         break;
                     case DownloadManager.STATUS_RUNNING: {
                         final long total = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+                        Log.i("size", String.valueOf(total));
                         if (total >= 0) {
                             final long downloaded = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
                             progress = (int) ((downloaded * 100L) / total);
@@ -172,7 +182,9 @@ public class PopUp {
                     case DownloadManager.STATUS_SUCCESSFUL: {
                         progress = 100;
                         finishDownload = true;
+                        Looper.prepare();
                         Toast.makeText(mContext, "Download Completed", Toast.LENGTH_SHORT).show();
+                        Looper.loop();
                         break;
                     }
                 }

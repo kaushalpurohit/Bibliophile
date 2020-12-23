@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     public ArrayList<String> linksList = new ArrayList<String>();
     public String[] imagesList = new String[10];
     public String[] titlesList = new String[10];
+    public String[] sizeList = new String[10];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,11 +61,13 @@ public class MainActivity extends AppCompatActivity {
                                             String title = res.getString("Title");
                                             String link = res.getString("Link");
                                             String image = res.getString("image");
+                                            String size = res.getString("size");
                                             imagesList[i-1] = image;
                                             titlesList[i-1] = title;
                                             linksList.add(link);
+                                            sizeList[i-1] = size;
                                         }
-                                        CustomGrid adapter = new CustomGrid(MainActivity.this, titlesList, imagesList);
+                                        CustomGrid adapter = new CustomGrid(MainActivity.this, titlesList, imagesList, sizeList);
                                         ExpandableHeightGridView exGrid=(ExpandableHeightGridView) findViewById(R.id.grid);
                                         exGrid.setNumColumns(2);
                                         exGrid.setAdapter(adapter);

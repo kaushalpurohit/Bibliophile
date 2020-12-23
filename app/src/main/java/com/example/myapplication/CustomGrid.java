@@ -2,6 +2,7 @@ package com.example.myapplication;
 
 import android.content.Context;
 import android.util.Log;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,11 +18,13 @@ public class CustomGrid extends BaseAdapter{
     private Context mContext;
     private String[] web;
     private String[] Imageid;
+    private String[] size;
 
-    public CustomGrid(Context c,String[] web,String[] Imageid ) {
+    public CustomGrid(Context c,String[] web,String[] Imageid , String[] size) {
         mContext = c;
         this.Imageid = Imageid;
         this.web = web;
+        this.size = size;
     }
 
     @Override
@@ -53,12 +56,14 @@ public class CustomGrid extends BaseAdapter{
 
             grid = inflater.inflate(R.layout.grid_single, null);
             TextView textView = (TextView) grid.findViewById(R.id.grid_text);
+            TextView sizeView = (TextView) grid.findViewById(R.id.size_text);
             AnimationSet mAnimationSet = new AnimationSet(false);
             ImageView imageView = (ImageView)grid.findViewById(R.id.grid_image);
             Animation fadeInAnimation = AnimationUtils.loadAnimation(grid.getContext(), android.R.anim.fade_in);
-            fadeInAnimation.setStartOffset(1000);
+            fadeInAnimation.setStartOffset(500);
             mAnimationSet.addAnimation(fadeInAnimation);
             textView.setText(web[position]);
+            sizeView.setText(size[position]);
             Log.i("message", String.valueOf(position));
             Picasso
                     .with(mContext)
