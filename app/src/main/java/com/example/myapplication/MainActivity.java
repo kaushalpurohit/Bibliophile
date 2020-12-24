@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
         text.setOnSearchClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View V){
+                text.setIconified(true);
                 Intent search = new Intent(MainActivity.this, Search.class);
                 startActivity(search);
             }
