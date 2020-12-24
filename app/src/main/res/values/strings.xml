@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Book downloader</string>
+    <string name="app_name">Bookdl</string>
     <string name="search">Search</string>
     <string name="textTitle">Title</string>
     <string name="textButton">Download</string>
