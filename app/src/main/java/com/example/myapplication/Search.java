@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -11,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -33,9 +35,16 @@ public class Search extends AppCompatActivity {
     public String[] sizeList = new String[10];
 
     protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_search);
-    getSupportActionBar().setDisplayShowTitleEnabled(false);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_search);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+    }
+
+
+@Override
+public boolean onSupportNavigateUp() {
+        finish();
+        return true;
 }
 
     public boolean onCreateOptionsMenu(Menu menu){

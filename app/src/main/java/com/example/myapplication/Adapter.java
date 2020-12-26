@@ -3,6 +3,8 @@ package com.example.myapplication;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteStatement;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -11,6 +13,7 @@ import android.view.LayoutInflater;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // The adapter class which
@@ -19,8 +22,8 @@ public class Adapter
         extends RecyclerView.Adapter<Adapter.MyView> {
 
     // List with String type
-    private String[] titleList;
-    private String[] imageList;
+    private List<String> titleList  = new ArrayList<>();
+    private List<String> imageList = new ArrayList<>();
     private Context mContext;
 
     // View Holder class which
@@ -47,7 +50,7 @@ public class Adapter
 
     // Constructor for adapter class
     // which takes a list of String type
-    public Adapter(Context context, String[] image, String[] title)
+    public Adapter(Context context, List<String> image, List<String> title)
     {
         this.imageList = image;
         this.titleList = title;
@@ -85,12 +88,12 @@ public class Adapter
 
         // Set the text of each item of
         // Recycler view with the list items
-        holder.textView.setText(titleList[position]);
-        Picasso
-                .with(mContext)
-                .load(imageList[position])
-                .fit() // will explain later
-                .into(holder.imageView);
+            holder.textView.setText(titleList.get(position));
+            Picasso
+                    .with(mContext)
+                    .load(imageList.get(position))
+                    .fit() // will explain later
+                    .into(holder.imageView);
     }
 
     // Override getItemCount which Returns
@@ -98,6 +101,6 @@ public class Adapter
     @Override
     public int getItemCount()
     {
-        return titleList.length;
+        return titleList.size();
     }
 }

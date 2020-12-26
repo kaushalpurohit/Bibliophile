@@ -22,11 +22,15 @@ import android.widget.TextView;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 
+import okhttp3.Cache;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -36,13 +40,15 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    private String[] titleList = new String[4];
-    private String[] linkList = new String[4];
-    private String[] imageList = new String[4];
-    private String[] sizeList = new String[4];
+    private List<String> titleList = new ArrayList<>();
+    private List<String> linkList = new ArrayList<>();
+    private List<String> imageList = new ArrayList<>();
+    private List<String> sizeList = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.SplashScreenTheme);
         super.onCreate(savedInstanceState);
+        setTheme(R.style.Theme_MyApplication);
         setContentView(R.layout.activity_main);
         createCategories();
     }
@@ -58,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View V){
                 text.setIconified(true);
                 Intent search = new Intent(MainActivity.this, Search.class);
+                search.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(search);
             }
         });
@@ -66,7 +73,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void createCategories() {
         String url = "https://bookdl-api.herokuapp.com/home";
-        OkHttpClient client = new OkHttpClient();
+        int cacheSize = 10 * 1024 * 1024;
+        File httpCacheDirectory = new File(getApplicationContext().getCacheDir(), "http-cache");
+        Cache cache = new Cache(httpCacheDirectory, cacheSize);
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addNetworkInterceptor(new CacheInterceptor())
+                .cache(cache)
+                .build();
         Request request = new Request.Builder()
                 .url(url)
                 .build();
@@ -83,14 +96,14 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             try {
-                                int val[] = new int[4];
-                                int rec[] = new int[4];
-                                for(int i=0; i<4; i++) {
+                                int val[] = new int[5];
+                                int rec[] = new int[5];
+                                for(int i=0; i<5; i++) {
                                     Log.i("id", "id/title"+(i+1));
                                     val[i] = getResources().getIdentifier("id/title"+(i+1), null, getPackageName());
                                     rec[i] = getResources().getIdentifier("id/recyclerview"+(i+1), null, getPackageName());
                                 }
-                                for(int i=0; i<4; i++) {
+                                for(int i=0; i<5; i++) {
                                     JSONObject res = (new JSONObject(myResponse)).getJSONObject(String.valueOf(i));
                                     Iterator<String> keys = res.keys();
                                     String property = "";
@@ -101,10 +114,10 @@ public class MainActivity extends AppCompatActivity {
                                     for (int j = 0; j < 4; j++ ) {
                                         try {
                                             JSONObject index = details.getJSONObject(String.valueOf(j));
-                                            titleList[j] = index.getString("title");
-                                            linkList[j] = index.getString("link");
-                                            imageList[j] = index.getString("image");
-                                            sizeList[j] = "";
+                                            titleList.add(index.getString("title"));
+                                            linkList.add(index.getString("link"));
+                                            imageList.add(index.getString("image"));
+                                            sizeList.add("");
                                         }
                                         catch (Exception e) {
                                             Log.i("Exception", "Length");
@@ -116,8 +129,8 @@ public class MainActivity extends AppCompatActivity {
                                     LinearLayoutManager HorizontalLayout = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false);
                                     recyclerView.setLayoutManager(HorizontalLayout);
                                     recyclerView.setAdapter(adapter);
-                                    titleList = new String[4];
-                                    imageList = new String[4];
+                                    titleList = new ArrayList<>();
+                                    imageList = new ArrayList<>();
                                 }
                             }
                             catch (Exception e){
