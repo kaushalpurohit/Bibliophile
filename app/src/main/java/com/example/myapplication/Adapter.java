@@ -3,13 +3,17 @@ package com.example.myapplication;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.sqlite.SQLiteStatement;
+import android.net.LinkAddress;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.view.LayoutInflater;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -26,6 +30,7 @@ public class Adapter
     private List<String> imageList = new ArrayList<>();
     private List<String> pageList = new ArrayList<>();
     private List<String> sizeList = new ArrayList<>();
+    private List<String> linkList = new ArrayList<>();
     private Context mContext;
 
     // View Holder class which
@@ -38,6 +43,7 @@ public class Adapter
         TextView pageText;
         TextView sizeText;
         ImageView imageView;
+        LinearLayout mainLayout;
 
         // parameterised constructor for View Holder class
         // which takes the view as a parameter
@@ -53,17 +59,19 @@ public class Adapter
             sizeText =  (TextView)view
                     .findViewById(R.id.size_text);
             imageView = (ImageView) view.findViewById((R.id.grid_image));
+            mainLayout = (LinearLayout) view.findViewById(R.id.mainLayout);
         }
     }
 
     // Constructor for adapter class
     // which takes a list of String type
-    public Adapter(Context context, List<String> image, List<String> title, List<String> page, List<String> size)
+    public Adapter(Context context, List<String> image, List<String> title, List<String> page, List<String> size, List<String> link)
     {
         this.imageList = image;
         this.titleList = title;
         this.pageList = page;
         this.sizeList = size;
+        this.linkList = link;
         this.mContext = context;
     }
 
@@ -106,6 +114,15 @@ public class Adapter
                     .load(imageList.get(position))
                     .fit() // will explain later
                     .into(holder.imageView);
+            holder.mainLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent download = new Intent(mContext, DownloadActivity.class);
+                    download.putExtra("url", linkList.get(position));
+                    download.putExtra("title", titleList.get(position));
+                    mContext.startActivity(download);
+                }
+            });
     }
 
     // Override getItemCount which Returns

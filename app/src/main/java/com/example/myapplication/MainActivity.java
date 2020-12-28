@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         createCategories();
     }
+
     public boolean onCreateOptionsMenu(Menu menu) {
         ProgressBar spinner = (ProgressBar) findViewById(R.id.progress);
         getMenuInflater().inflate(R.menu.options_menu, menu);
@@ -125,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
                                             Log.i("Exception", "Length");
                                         }
                                     }
-                                    Adapter adapter = new Adapter(MainActivity.this, imageList, titleList, pageList, sizeList);
+                                    Adapter adapter = new Adapter(MainActivity.this, imageList, titleList, pageList, sizeList, linkList);
                                     RecyclerView recyclerView = (RecyclerView)findViewById(rec[i]);
                                     LinearLayoutManager RecyclerViewLayoutManager = new LinearLayoutManager(getApplicationContext());
                                     LinearLayoutManager HorizontalLayout = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false);
@@ -133,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
                                     recyclerView.setAdapter(adapter);
                                     titleList = new ArrayList<>();
                                     imageList = new ArrayList<>();
+                                    linkList = new ArrayList<>();
                                 }
                             }
                             catch (Exception e){

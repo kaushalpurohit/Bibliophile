@@ -3,26 +3,29 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
-
-    <androidx.cardview.widget.CardView
-        android:layout_width="@dimen/_140sdp"
-        android:layout_height="@dimen/_260sdp"
-        android:layout_gravity="center"
-        android:adjustViewBounds="true"
-        card_view:cardCornerRadius="@dimen/_15sdp"
-        card_view:contentPadding="@dimen/_5sdp"
-        android:layout_marginLeft="@dimen/_20sdp"
-        android:layout_marginRight="@dimen/_20sdp"
-        android:layout_marginTop="@dimen/_8sdp"
-        android:layout_marginBottom="@dimen/_30sdp"
-        card_view:cardElevation="15dp">
+    android:orientation="vertical"
+    android:id="@+id/mainLayout">
 
     <androidx.cardview.widget.CardView
         android:layout_width="@dimen/_130sdp"
-        android:layout_height="@dimen/_145sdp"
+        android:layout_height="@dimen/_220sdp"
+        android:layout_gravity="center"
+        card_view:cardPreventCornerOverlap="false"
+        card_view:cardCornerRadius="@dimen/_14sdp"
+        android:layout_marginLeft="@dimen/_15sdp"
+        android:layout_marginRight="@dimen/_15sdp"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:layout_marginBottom="@dimen/_30sdp"
+        card_view:cardElevation="@dimen/_5sdp">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="@dimen/_120sdp"
+        android:layout_height="@dimen/_135sdp"
         android:adjustViewBounds="true"
         card_view:cardElevation="0dp"
+        android:layout_marginTop="@dimen/_4sdp"
+        android:layout_marginLeft="@dimen/_5sdp"
+        android:layout_marginStart="@dimen/_5sdp"
         card_view:cardCornerRadius="@dimen/_8sdp">
 
         <ImageView
@@ -35,10 +38,13 @@
 
         <TextView
             android:id="@+id/grid_text"
-            android:layout_width="@dimen/_130sdp"
-            android:layout_height="@dimen/_80sdp"
-            android:layout_marginTop="@dimen/_150sdp"
+            android:layout_width="@dimen/_120sdp"
+            android:layout_height="@dimen/_58sdp"
+            android:layout_marginTop="@dimen/_145sdp"
             android:textAlignment="center"
+            android:layout_marginLeft="@dimen/_5sdp"
+            android:layout_marginStart="@dimen/_5sdp"
+            android:ellipsize="end"
             android:textColor="@color/black"
             android:textStyle="bold"
             android:textSize="12sp" />
@@ -47,8 +53,8 @@
             android:id="@+id/size_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_240sdp"
-            android:layout_marginLeft="@dimen/_95sdp"
+            android:layout_marginTop="@dimen/_205sdp"
+            android:layout_marginLeft="@dimen/_90sdp"
             android:textAlignment="textStart"
             android:textColor="@color/black"
             android:textSize="8sp" />
@@ -57,9 +63,9 @@
             android:id="@+id/page_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_240sdp"
+            android:layout_marginTop="@dimen/_205sdp"
             android:textColor="@color/black"
-            android:layout_marginLeft="@dimen/_12sdp"
+            android:layout_marginLeft="@dimen/_10sdp"
             android:text="TextView"
             android:textSize="8sp"/>
 
