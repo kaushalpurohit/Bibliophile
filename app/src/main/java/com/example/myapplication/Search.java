@@ -33,6 +33,7 @@ public class Search extends AppCompatActivity {
     public String[] imagesList = new String[10];
     public String[] titlesList = new String[10];
     public String[] sizeList = new String[10];
+    public String[] pageList = new String[10];
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +53,10 @@ public boolean onSupportNavigateUp() {
         getMenuInflater().inflate(R.menu.options_menu, menu);
         MenuItem search_item = menu.findItem(R.id.search);
         SearchView text = (SearchView) search_item.getActionView();
-        text.setIconifiedByDefault(false);
+        text.requestFocus();
+        text.setMaxWidth(Integer.MAX_VALUE);
+        text.setIconified(false);
+        text.setFocusable(true);
         text.setQueryHint("search");
         text.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -84,13 +88,15 @@ public boolean onSupportNavigateUp() {
                                             String link = res.getString("Link");
                                             String image = res.getString("image");
                                             String size = res.getString("size");
+                                            String page = res.getString("page");
                                             imagesList[i-1] = image;
                                             titlesList[i-1] = title;
                                             linksList.add(link);
                                             sizeList[i-1] = size;
+                                            pageList[i-1] = page;
                                         }
                                         spinner.setVisibility(View.GONE);
-                                        CustomGrid adapter = new CustomGrid(Search.this, titlesList, imagesList, sizeList);
+                                        CustomGrid adapter = new CustomGrid(Search.this, titlesList, imagesList, sizeList, pageList);
                                         GridView exGrid=(GridView) findViewById(R.id.grid);
                                         exGrid.setNumColumns(2);
                                         exGrid.setAdapter(adapter);
@@ -123,32 +129,6 @@ public boolean onSupportNavigateUp() {
         });
 
         return true;
-    }
-
-    public void closeKeyboard()
-    {
-        // this will give us the view
-        // which is currently focus
-        // in this layout
-        View view = this.getCurrentFocus();
-        InputMethodManager manager = (InputMethodManager) getSystemService(
-                Context.INPUT_METHOD_SERVICE);
-        manager
-                .hideSoftInputFromWindow(
-                        view.getWindowToken(), 0);
-
-        // if nothing is currently
-        // focus then this will protect
-        // the app from crash
-        if (view != null) {
-
-            // now assign the system
-            // service to InputMethodManager
-            manager
-                    .hideSoftInputFromWindow(
-                            view.getWindowToken(), 0);
-        }
-
     }
 
 }

@@ -3,5 +3,6 @@
     <style name="Theme.MyApplication" parent="Theme.MaterialComponents.Light.DarkActionBar">
         <item name="colorPrimaryDark">@color/teal_200</item>
         <item name="colorPrimary">@color/teal_200</item>
+        <item name="colorControlActivated">@color/white</item>
     </style>
 </resources>

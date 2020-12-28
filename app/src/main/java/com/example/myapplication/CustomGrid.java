@@ -19,12 +19,14 @@ public class CustomGrid extends BaseAdapter{
     private String[] web;
     private String[] Imageid;
     private String[] size;
+    private String[] page;
 
-    public CustomGrid(Context c,String[] web,String[] Imageid , String[] size) {
+    public CustomGrid(Context c,String[] web,String[] Imageid , String[] size, String[] page) {
         mContext = c;
         this.Imageid = Imageid;
         this.web = web;
         this.size = size;
+        this.page = page;
     }
 
     @Override
@@ -57,6 +59,7 @@ public class CustomGrid extends BaseAdapter{
             grid = inflater.inflate(R.layout.grid_single, null);
             TextView textView = (TextView) grid.findViewById(R.id.grid_text);
             TextView sizeView = (TextView) grid.findViewById(R.id.size_text);
+            TextView pageView = (TextView) grid.findViewById(R.id.page_text);
             AnimationSet mAnimationSet = new AnimationSet(false);
             ImageView imageView = (ImageView)grid.findViewById(R.id.grid_image);
             Animation fadeInAnimation = AnimationUtils.loadAnimation(grid.getContext(), android.R.anim.fade_in);
@@ -64,6 +67,7 @@ public class CustomGrid extends BaseAdapter{
             mAnimationSet.addAnimation(fadeInAnimation);
             textView.setText(web[position]);
             sizeView.setText(size[position]);
+            pageView.setText(page[position]);
             Log.i("message", String.valueOf(position));
             Picasso
                     .with(mContext)

@@ -24,6 +24,8 @@ public class Adapter
     // List with String type
     private List<String> titleList  = new ArrayList<>();
     private List<String> imageList = new ArrayList<>();
+    private List<String> pageList = new ArrayList<>();
+    private List<String> sizeList = new ArrayList<>();
     private Context mContext;
 
     // View Holder class which
@@ -33,6 +35,8 @@ public class Adapter
 
         // Text View
         TextView textView;
+        TextView pageText;
+        TextView sizeText;
         ImageView imageView;
 
         // parameterised constructor for View Holder class
@@ -44,16 +48,22 @@ public class Adapter
             // initialise TextView with id
             textView = (TextView)view
                     .findViewById(R.id.grid_text);
+            pageText =  (TextView)view
+                    .findViewById(R.id.page_text);
+            sizeText =  (TextView)view
+                    .findViewById(R.id.size_text);
             imageView = (ImageView) view.findViewById((R.id.grid_image));
         }
     }
 
     // Constructor for adapter class
     // which takes a list of String type
-    public Adapter(Context context, List<String> image, List<String> title)
+    public Adapter(Context context, List<String> image, List<String> title, List<String> page, List<String> size)
     {
         this.imageList = image;
         this.titleList = title;
+        this.pageList = page;
+        this.sizeList = size;
         this.mContext = context;
     }
 
@@ -89,6 +99,8 @@ public class Adapter
         // Set the text of each item of
         // Recycler view with the list items
             holder.textView.setText(titleList.get(position));
+            holder.pageText.setText(pageList.get(position));
+            holder.sizeText.setText(sizeList.get(position));
             Picasso
                     .with(mContext)
                     .load(imageList.get(position))

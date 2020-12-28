@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private List<String> linkList = new ArrayList<>();
     private List<String> imageList = new ArrayList<>();
     private List<String> sizeList = new ArrayList<>();
+    private List<String> pageList = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.SplashScreenTheme);
@@ -117,13 +118,14 @@ public class MainActivity extends AppCompatActivity {
                                             titleList.add(index.getString("title"));
                                             linkList.add(index.getString("link"));
                                             imageList.add(index.getString("image"));
-                                            sizeList.add("");
+                                            sizeList.add(index.getString("size"));
+                                            pageList.add(index.getString("page"));
                                         }
                                         catch (Exception e) {
                                             Log.i("Exception", "Length");
                                         }
                                     }
-                                    Adapter adapter = new Adapter(MainActivity.this, imageList, titleList);
+                                    Adapter adapter = new Adapter(MainActivity.this, imageList, titleList, pageList, sizeList);
                                     RecyclerView recyclerView = (RecyclerView)findViewById(rec[i]);
                                     LinearLayoutManager RecyclerViewLayoutManager = new LinearLayoutManager(getApplicationContext());
                                     LinearLayoutManager HorizontalLayout = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false);
