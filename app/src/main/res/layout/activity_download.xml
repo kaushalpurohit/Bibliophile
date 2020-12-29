@@ -57,13 +57,14 @@
                     android:layout_marginLeft="@dimen/_10sdp"/>
 
                 <Button
-                    android:id="@+id/button"
+                    android:id="@+id/downloadButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/download"
                     android:layout_marginLeft="@dimen/_180sdp"
                     android:layout_marginStart="@dimen/_180sdp"
-                    android:layout_marginTop="@dimen/_160sdp"/>
+                    android:layout_marginTop="@dimen/_160sdp"
+                    android:elevation="@dimen/_5sdp"/>
 
                 <TextView
                     android:layout_width="wrap_content"

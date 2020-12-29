@@ -1,17 +1,24 @@
 package com.example.myapplication;
 
+import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
+import android.service.autofill.OnClickAction;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.DownloadListener;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,7 +28,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,8 +44,9 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class DownloadActivity extends AppCompatActivity {
-    private String link = " ";
-    private String title = " ";
+    private String link = "";
+    private String title = "";
+    private String download_url = "";
     private List<String> infoList = new ArrayList<>();
     private List<String> tagList = new ArrayList<>();
     private List<String> titleList = new ArrayList<>();
@@ -52,6 +64,13 @@ public class DownloadActivity extends AppCompatActivity {
         link = intent.getStringExtra("url");
         title = intent.getStringExtra("title");
         displayData();
+        final Button button = findViewById(R.id.downloadButton);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                download();
+            }
+        });
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -109,7 +128,7 @@ public class DownloadActivity extends AppCompatActivity {
                                         .load(image)
                                         .fit() // will explain later
                                         .into(imageView);
-                                String download_url  = res.getString("download_url");
+                                download_url  = res.getString("download_url");
                                 JSONArray info= res.getJSONArray("info");
                                 JSONArray tags = res.getJSONArray("tags");
                                 for (int i = 0; i<4; i++) {
@@ -162,5 +181,93 @@ public class DownloadActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public void download() {
+        String url = "https://bookdl-api.herokuapp.com/download?url=" + download_url;
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addNetworkInterceptor(new CacheInterceptor())
+                .build();
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    final String myResponse = response.body().string();
+                    DownloadActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                JSONObject res = new JSONObject(myResponse);
+                                //String finalDownloadUrl = res.getString("link");
+                                String finalDownloadUrl = res.getString("link");
+                                Log.i("finalUrl", finalDownloadUrl);
+                                String dirPath = "/storage/emulated/0/Download";
+                                download_file(finalDownloadUrl, title);
+
+                            } catch (Exception e) {
+                                Log.i("exception", "1", e);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    public void download_file(String downloadUrl, String title) {
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url(downloadUrl)
+                .header("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36")
+                .build();
+        Thread thread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try  {
+                    Response response = client.newCall(request).execute();
+                    if (!response.isSuccessful()) {
+                        throw new IOException("Failed to download file: " + response);
+                    }
+                    InputStream inputStream = response.body().byteStream();
+
+                    byte[] buff = new byte[1024 * 4];
+                    long downloaded = 0;
+                    long target = response.body().contentLength();
+                    String extension = response.headers().get("Content-type");
+                    extension = extension.substring(extension.indexOf("/") + 1);
+                    Log.i("extension", extension);
+                    String fileName = title + "." + extension;
+                    File mediaFile = new File("/storage/emulated/0/Download", fileName);
+                    OutputStream output = new FileOutputStream(mediaFile);
+
+                    while (true) {
+                        int readed = inputStream.read(buff);
+
+                        if (readed == -1) {
+                            break;
+                        }
+                        output.write(buff, 0, readed);
+                        //write buff
+                        downloaded += readed;
+                    }
+
+                    output.flush();
+                    output.close();
+                    Log.i("Download", "File written!");
+                } catch (Exception e) {
+                    Log.i("IOException", e.toString());
+                }
+            }
+        });
+        thread.start();
     }
 }
