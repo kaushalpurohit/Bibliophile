@@ -5,4 +5,6 @@
     <string name="textButton">Download</string>
     <string name="Book">Book</string>
     <string name="download">Download</string>
+    <string name="cancel">Cancel</string>
+    <string name="_0">0%</string>
 </resources>

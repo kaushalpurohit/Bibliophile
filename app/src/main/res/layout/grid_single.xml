@@ -12,8 +12,8 @@
         android:layout_gravity="center"
         card_view:cardPreventCornerOverlap="false"
         card_view:cardCornerRadius="@dimen/_14sdp"
-        android:layout_marginLeft="@dimen/_15sdp"
-        android:layout_marginRight="@dimen/_15sdp"
+        android:layout_marginLeft="@dimen/_12sdp"
+        android:layout_marginRight="@dimen/_12sdp"
         android:layout_marginTop="@dimen/_8sdp"
         android:layout_marginBottom="@dimen/_30sdp"
         card_view:cardElevation="@dimen/_5sdp">

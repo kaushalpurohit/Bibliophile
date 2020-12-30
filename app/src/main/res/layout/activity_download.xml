@@ -39,6 +39,18 @@
                     android:layout_marginLeft="@dimen/_180sdp"
                     android:layout_marginStart="@dimen/_180sdp"
                     android:layout_marginTop="@dimen/_10sdp"/>
+                <TextView
+                    android:id="@+id/percent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:textSize="8sp"
+                    android:text="@string/_0"
+                    android:visibility="invisible"
+                    android:layout_marginLeft="@dimen/_180sdp"
+                    android:layout_marginStart="@dimen/_180sdp"
+                    android:layout_marginTop="@dimen/_158sdp"/>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/info"
@@ -63,8 +75,17 @@
                     android:text="@string/download"
                     android:layout_marginLeft="@dimen/_180sdp"
                     android:layout_marginStart="@dimen/_180sdp"
-                    android:layout_marginTop="@dimen/_160sdp"
-                    android:elevation="@dimen/_5sdp"/>
+                    android:layout_marginTop="@dimen/_170sdp" />
+
+                <Button
+                    android:id="@+id/cancelButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/cancel"
+                    android:layout_marginLeft="@dimen/_180sdp"
+                    android:layout_marginStart="@dimen/_180sdp"
+                    android:layout_marginTop="@dimen/_170sdp"
+                    android:visibility="invisible"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -85,6 +106,18 @@
                     android:layout_marginTop="@dimen/_295sdp"
                     app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                     app:spanCount="2" />
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:progressTint="@color/teal_200"
+                    android:progress="0"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="@dimen/_120sdp"
+                    android:visibility="invisible"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_150sdp"
+                    android:layout_marginLeft="@dimen/_180sdp"
+                    android:layout_marginStart="@dimen/_180sdp"/>
             </RelativeLayout>
     </androidx.core.widget.NestedScrollView>
 

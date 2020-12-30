@@ -1,37 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".MainActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
     <ProgressBar
-        android:id="@+id/progress"
+        android:id="@+id/loading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:indeterminate="true"
+        android:layout_centerInParent="true"
         android:gravity="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:visibility="gone"/>
+        android:visibility="invisible"
+        android:progressTint="@color/teal_200"
+        android:progressBackgroundTint="@color/teal_200"
+        android:indeterminate="true" />
 
-    <GridView
-        android:id="@+id/grid"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/searchRecycler"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:listSelector="#00343434"
-        android:numColumns="2"
-        android:orientation="vertical"
-        android:stretchMode="columnWidth"
-        android:layout_marginBottom="@dimen/_5sdp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:spanCount="2"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>
