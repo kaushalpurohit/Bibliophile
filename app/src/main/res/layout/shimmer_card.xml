@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <androidx.cardview.widget.CardView
+            android:layout_width="@dimen/_130sdp"
+            android:layout_height="@dimen/_220sdp"
+            android:layout_gravity="center"
+            app:cardBackgroundColor="@color/colorGrey"
+            app:cardPreventCornerOverlap="false"
+            app:cardCornerRadius="@dimen/_14sdp"
+            android:layout_marginLeft="@dimen/_12sdp"
+            android:layout_marginRight="@dimen/_12sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:layout_marginBottom="@dimen/_30sdp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/_154sdp"
+        android:layout_marginStart="@dimen/_154sdp"
+        android:orientation="vertical">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="@dimen/_130sdp"
+            android:layout_height="@dimen/_220sdp"
+            android:layout_gravity="center"
+            app:cardBackgroundColor="@color/colorGrey"
+            android:layout_marginLeft="@dimen/_12sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:layout_marginRight="@dimen/_12sdp"
+            android:layout_marginBottom="@dimen/_30sdp"
+            app:cardCornerRadius="@dimen/_14sdp"
+            app:cardPreventCornerOverlap="false" />
+    </LinearLayout>
+</RelativeLayout>

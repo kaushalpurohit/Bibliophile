@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent">
+        <androidx.cardview.widget.CardView
+            android:layout_width="@dimen/_150sdp"
+            android:layout_height="@dimen/_200sdp"
+            android:adjustViewBounds="true"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_marginLeft="@dimen/_10sdp"
+            android:layout_marginStart="@dimen/_10sdp"
+            app:cardBackgroundColor="@color/colorGrey"
+            app:cardElevation="@dimen/_5sdp"
+            app:cardCornerRadius="@dimen/_8sdp"/>
+
+        <TextView
+            android:layout_width="@dimen/_120sdp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:background="@color/colorGrey"
+            android:textStyle="bold"
+            android:textSize="12sp"
+            android:layout_marginLeft="@dimen/_180sdp"
+            android:layout_marginStart="@dimen/_180sdp"
+            android:layout_marginTop="@dimen/_10sdp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/_80sdp"
+            android:background="@color/colorGrey"
+            android:layout_marginLeft="@dimen/_180sdp"
+            android:layout_marginStart="@dimen/_180sdp"
+            android:layout_marginTop="@dimen/_60sdp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="@dimen/_180sdp"
+            android:layout_height="@dimen/_20sdp"
+            android:background="@color/colorGrey"
+            android:layout_marginTop="@dimen/_230sdp"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginLeft="@dimen/_10sdp"/>
+
+        <TextView
+            android:layout_width="@dimen/_150sdp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:text=""
+            android:textSize="28sp"
+            android:background="@color/colorGrey"
+            android:layout_marginLeft="@dimen/_10sdp"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_265sdp"/>
+        <LinearLayout
+            android:layout_marginTop="@dimen/_295sdp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <include layout="@layout/shimmer_card"></include>
+        </LinearLayout>
+</RelativeLayout>

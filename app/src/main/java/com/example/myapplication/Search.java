@@ -20,6 +20,8 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.facebook.shimmer.ShimmerFrameLayout;
+
 import org.json.JSONObject;
 
 import java.io.File;
@@ -40,6 +42,7 @@ public class Search extends AppCompatActivity {
     private List<String> imageList = new ArrayList<>();
     private List<String> sizeList = new ArrayList<>();
     private List<String> pageList = new ArrayList<>();
+    private ShimmerFrameLayout container;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +59,6 @@ public class Search extends AppCompatActivity {
     }
 
     public boolean onCreateOptionsMenu(Menu menu){
-        ProgressBar spinner=(ProgressBar)findViewById(R.id.loading);
         getMenuInflater().inflate(R.menu.options_menu, menu);
         MenuItem search_item = menu.findItem(R.id.search);
         SearchView text = (SearchView) search_item.getActionView();
@@ -68,9 +70,11 @@ public class Search extends AppCompatActivity {
         text.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String search) {
+                container = (ShimmerFrameLayout) findViewById(R.id.shimmer_view_container_search);
+                container.setVisibility(View.VISIBLE);
+                container.startShimmer();
                 RecyclerView searchRecycler = (RecyclerView) findViewById(R.id.searchRecycler);
                 searchRecycler.setAdapter(null);
-                spinner.setVisibility(View.VISIBLE);
                 int cacheSize = 10 * 1024 * 1024;
                 File httpCacheDirectory = new File(getApplicationContext().getCacheDir(), "http-cache");
                 Cache cache = new Cache(httpCacheDirectory, cacheSize);
@@ -108,12 +112,14 @@ public class Search extends AppCompatActivity {
                                             sizeList.add(size);
                                             pageList.add(page);
                                         }
-                                        spinner.setVisibility(View.GONE);
                                         Adapter adapter = new Adapter(Search.this, imageList, titleList, pageList, sizeList, linkList);
                                         RecyclerView recyclerView = (RecyclerView)findViewById(R.id.searchRecycler);
                                         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(Search.this, 2);
                                         recyclerView.setLayoutManager(mLayoutManager);
                                         recyclerView.setAdapter(adapter);
+                                        searchRecycler.setVisibility(View.VISIBLE);
+                                        container.stopShimmer();
+                                        container.setVisibility(View.GONE);
                                         titleList = new ArrayList<>();
                                         linkList = new ArrayList<>();
                                         imageList = new ArrayList<>();
@@ -133,7 +139,6 @@ public class Search extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                spinner.setVisibility(View.GONE);
                 RecyclerView searchRecycler=(RecyclerView) findViewById(R.id.searchRecycler);
                 searchRecycler.setAdapter(null);
                 return false;

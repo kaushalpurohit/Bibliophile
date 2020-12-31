@@ -7,18 +7,32 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <ProgressBar
-        android:id="@+id/loading"
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmer_view_container_search"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:gravity="center"
-        android:visibility="invisible"
-        android:progressTint="@color/teal_200"
-        android:progressBackgroundTint="@color/teal_200"
-        android:indeterminate="true" />
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        app:shimmer_auto_start="false"
+        android:visibility="gone">
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <include layout="@layout/shimmer_card"></include>
+                <include layout="@layout/shimmer_card"></include>
+                <include layout="@layout/shimmer_card"></include>
+                <include layout="@layout/shimmer_card"></include>
+                <include layout="@layout/shimmer_card"></include>
+            </LinearLayout>
+        </ScrollView>
+    </com.facebook.shimmer.ShimmerFrameLayout>
 
     <androidx.recyclerview.widget.RecyclerView
+        android:visibility="gone"
         android:id="@+id/searchRecycler"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

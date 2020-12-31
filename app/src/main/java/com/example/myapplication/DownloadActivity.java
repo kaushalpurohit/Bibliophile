@@ -13,12 +13,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -57,6 +61,7 @@ public class DownloadActivity extends AppCompatActivity {
     private List<String> imageList = new ArrayList<>();
     private List<String> sizeList = new ArrayList<>();
     private List<String> pageList = new ArrayList<>();
+    private ShimmerFrameLayout container;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +71,8 @@ public class DownloadActivity extends AppCompatActivity {
         Intent intent = getIntent();
         link = intent.getStringExtra("url");
         title = intent.getStringExtra("title");
+        container = (ShimmerFrameLayout) findViewById(R.id.shimmer_view_container_download);
+        container.startShimmer();
         displayData();
         Button downloadButton = findViewById(R.id.downloadButton);
         downloadButton.setOnClickListener(new View.OnClickListener() {
@@ -77,7 +84,6 @@ public class DownloadActivity extends AppCompatActivity {
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
-        ProgressBar spinner = (ProgressBar) findViewById(R.id.loading);
         getMenuInflater().inflate(R.menu.options_menu, menu);
         MenuItem search_item = menu.findItem(R.id.search);
         SearchView text = (SearchView) search_item.getActionView();
@@ -175,6 +181,10 @@ public class DownloadActivity extends AppCompatActivity {
                                 infoRecyclerView.setAdapter(infoAdapter);
                                 recyclerView.setAdapter(adapter);
                                 tagRecyclerView.setAdapter(tagAdapter);
+                                container.stopShimmer();
+                                container.setVisibility(View.GONE);
+                                androidx.core.widget.NestedScrollView homeLayout = (androidx.core.widget.NestedScrollView) findViewById(R.id.download_scroll);
+                                homeLayout.setVisibility(View.VISIBLE);
                             }
                             catch (Exception e){
                                 Log.i("exception", "1", e);

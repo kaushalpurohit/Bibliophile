@@ -9,9 +9,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.SearchView;
 import android.widget.TextView;
+
+import com.facebook.shimmer.ShimmerFrameLayout;
 
 import org.json.JSONObject;
 
@@ -36,17 +40,19 @@ public class MainActivity extends AppCompatActivity {
     private List<String> imageList = new ArrayList<>();
     private List<String> sizeList = new ArrayList<>();
     private List<String> pageList = new ArrayList<>();
+    private ShimmerFrameLayout container;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.SplashScreenTheme);
         super.onCreate(savedInstanceState);
         setTheme(R.style.Theme_MyApplication);
         setContentView(R.layout.activity_main);
+        container = (ShimmerFrameLayout) findViewById(R.id.shimmer_view_container);
+        container.startShimmer();
         createCategories();
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
-        ProgressBar spinner = (ProgressBar) findViewById(R.id.loading);
         getMenuInflater().inflate(R.menu.options_menu, menu);
         MenuItem search_item = menu.findItem(R.id.search);
         SearchView text = (SearchView) search_item.getActionView();
@@ -127,6 +133,10 @@ public class MainActivity extends AppCompatActivity {
                                     imageList = new ArrayList<>();
                                     linkList = new ArrayList<>();
                                 }
+                                container.stopShimmer();
+                                container.setVisibility(View.GONE);
+                                ScrollView homeLayout = (ScrollView) findViewById(R.id.scroll_view);
+                                homeLayout.setVisibility(View.VISIBLE);
                             }
                             catch (Exception e){
                                 Log.i("exception", "1", e);
