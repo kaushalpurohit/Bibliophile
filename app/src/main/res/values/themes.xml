@@ -4,5 +4,6 @@
         <item name="colorPrimaryDark">@color/teal_200</item>
         <item name="colorPrimary">@color/teal_200</item>
         <item name="colorControlActivated">@color/white</item>
+        <item name="android:textColor">@color/black</item>
     </style>
 </resources>

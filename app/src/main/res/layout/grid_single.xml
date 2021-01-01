@@ -26,7 +26,7 @@
         android:layout_marginTop="@dimen/_4sdp"
         android:layout_marginLeft="@dimen/_5sdp"
         android:layout_marginStart="@dimen/_5sdp"
-        card_view:cardCornerRadius="@dimen/_8sdp">
+        card_view:cardCornerRadius="@dimen/_6sdp">
 
         <ImageView
             android:id="@+id/grid_image"
@@ -45,7 +45,6 @@
             android:layout_marginLeft="@dimen/_5sdp"
             android:layout_marginStart="@dimen/_5sdp"
             android:ellipsize="end"
-            android:textColor="@color/black"
             android:textStyle="bold"
             android:textSize="12sp" />
 
@@ -56,7 +55,6 @@
             android:layout_marginTop="@dimen/_205sdp"
             android:layout_marginLeft="@dimen/_90sdp"
             android:textAlignment="textStart"
-            android:textColor="@color/black"
             android:textSize="8sp" />
 
         <TextView
@@ -64,7 +62,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_205sdp"
-            android:textColor="@color/black"
             android:layout_marginLeft="@dimen/_10sdp"
             android:text="TextView"
             android:textSize="8sp"/>
