@@ -73,6 +73,7 @@ public class DownloadActivity extends AppCompatActivity {
         title = intent.getStringExtra("title");
         container = (ShimmerFrameLayout) findViewById(R.id.shimmer_view_container_download);
         container.startShimmer();
+        checkIfFileExists();
         displayData();
         Button downloadButton = findViewById(R.id.downloadButton);
         downloadButton.setOnClickListener(new View.OnClickListener() {
@@ -100,6 +101,39 @@ public class DownloadActivity extends AppCompatActivity {
         });
         return true;
     }
+
+    public void checkIfFileExists(){
+        String dirPath = Environment.getExternalStorageDirectory() + File.separator + "Books" ;
+        dirPath = dirPath + File.separator + title + ".pdf";
+        File file = new File(dirPath);
+        if (file.exists()) {
+            Button downloadButton = (Button) findViewById(R.id.downloadButton);
+            Button deleteButton = (Button) findViewById(R.id.deleteButton);
+            downloadButton.setVisibility(View.INVISIBLE);
+            deleteButton.setVisibility(View.VISIBLE);
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    boolean deleted = file.delete();
+                    if (deleted) {
+                        Snackbar snackBar = Snackbar .make(v, "Deleted " + title, Snackbar.LENGTH_SHORT);
+                        snackBar.setBackgroundTint(Color.parseColor("#FF03DAC5"));
+                        snackBar.setTextColor(Color.WHITE);
+                        downloadButton.setVisibility(View.VISIBLE);
+                        deleteButton.setVisibility(View.INVISIBLE);
+                        snackBar.show();
+                    }
+                    else {
+                        Snackbar snackBar = Snackbar .make(v, "Couldn't delete the book " + title, Snackbar.LENGTH_SHORT);
+                        snackBar.setBackgroundTint(Color.parseColor("#FF03DAC5"));
+                        snackBar.setTextColor(Color.WHITE);
+                        snackBar.show();
+                    }
+                }
+            });
+        }
+    }
+
 
     public void displayData() {
         String url = "https://bookdl-api.herokuapp.com/download_page?url=" + link;

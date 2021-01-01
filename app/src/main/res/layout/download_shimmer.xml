@@ -56,6 +56,7 @@
             android:layout_marginTop="@dimen/_295sdp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
-            <include layout="@layout/shimmer_card"></include>
+                <include layout="@layout/shimmer_card"></include>
+                <include layout="@layout/shimmer_card"></include>
         </LinearLayout>
 </RelativeLayout>

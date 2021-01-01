@@ -12,6 +12,8 @@
         android:layout_marginTop="@dimen/_20sdp"
         android:textColor="@color/black"
         android:background="@color/colorGrey"
+        android:layout_marginRight="@dimen/_10sdp"
+        android:layout_marginLeft="@dimen/_10sdp"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"

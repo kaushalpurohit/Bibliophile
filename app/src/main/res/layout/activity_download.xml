@@ -93,6 +93,16 @@
                     android:layout_marginTop="@dimen/_170sdp" />
 
                 <Button
+                    android:id="@+id/deleteButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/delete"
+                    android:layout_marginLeft="@dimen/_180sdp"
+                    android:layout_marginStart="@dimen/_180sdp"
+                    android:layout_marginTop="@dimen/_170sdp"
+                    android:visibility="invisible"/>
+
+                <Button
                     android:id="@+id/cancelButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
