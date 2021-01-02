@@ -254,17 +254,6 @@ public class DownloadActivity extends AppCompatActivity {
     }
 
     public void download(View v) {
-        int permission = ActivityCompat.checkSelfPermission(DownloadActivity.this, WRITE_EXTERNAL_STORAGE);
-
-        if (permission == PackageManager.PERMISSION_DENIED) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(
-                    DownloadActivity.this,
-                    new String[] {WRITE_EXTERNAL_STORAGE,
-                            READ_EXTERNAL_STORAGE},
-                    1
-            );
-        }
         Snackbar snackBar = Snackbar .make(v, "Please wait", Snackbar.LENGTH_SHORT);
         snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
         snackBar.setTextColor(Color.WHITE);
