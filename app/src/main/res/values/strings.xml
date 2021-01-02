@@ -13,4 +13,7 @@
     <string name="similar_books">Similar books</string>
     <string name="searchBooks">Search for books</string>
     <string name="read">Read</string>
+    <string name="mybooks">My books</string>
+    <string name="my_books">My books</string>
+    <string name="about">About</string>
 </resources>

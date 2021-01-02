@@ -17,8 +17,8 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.MyApplication">
         <activity android:name=".Search"
-            android:parentActivityName=".MainActivity">
-        </activity>
+            android:parentActivityName=".MainActivity"/>
+        <activity android:name=".MyBooks"/>
         <activity android:name=".MainActivity" />
         <activity android:name=".DownloadActivity"
             android:parentActivityName=".MainActivity"/>

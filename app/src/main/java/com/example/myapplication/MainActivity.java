@@ -22,6 +22,7 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.material.navigation.NavigationView;
@@ -42,7 +43,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener{
 
     private List<String> titleList = new ArrayList<>();
     private List<String> linkList = new ArrayList<>();
@@ -59,8 +61,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         container = (ShimmerFrameLayout) findViewById(R.id.shimmer_view_container);
         container.startShimmer();
-        createCategoryButtons();
-        createCategories();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -69,21 +69,10 @@ public class MainActivity extends AppCompatActivity {
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int id = item.getItemId();
-                if (id == R.id.about) {
-                    Log.i("Drawer", "About");
-                }
-                if (id == R.id.books) {
-                    Log.i("Drawer", "My books");
-                }
-                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                drawer.closeDrawer(GravityCompat.START);
-                return true;
-            }
-        });
+        navigationView.bringToFront();
+        navigationView.setNavigationItemSelectedListener(this);
+        createCategoryButtons();
+        createCategories();
     }
     @Override
     public void onBackPressed() {
@@ -93,15 +82,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
-    }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        //noinspection SimplifiableIfStatement
-        return super.onOptionsItemSelected(item);
     }
     @SuppressWarnings("StatementWithEmptyBody")
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -120,10 +100,25 @@ public class MainActivity extends AppCompatActivity {
         });
         return true;
     }
+    @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        return false;
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        switch(item.getItemId()){
+            case R.id.about:
+                Log.i("Drawer", "about");
+                break;
+            case R.id.books:
+                Intent myBooks = new Intent(MainActivity.this, MyBooks.class);
+                myBooks.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(myBooks);
+        }
+
+        //DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        //drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
+
     public void createCategories() {
         String url = "https://bookdl-api.herokuapp.com/home";
         int cacheSize = 10 * 1024 * 1024;
