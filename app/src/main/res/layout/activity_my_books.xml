@@ -34,4 +34,10 @@
                 android:iconifiedByDefault="true" />
         </RelativeLayout>
     </androidx.appcompat.widget.Toolbar>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/myBooksRecycler"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="?attr/actionBarSize"
+        app:spanCount="2"/>
 </RelativeLayout>

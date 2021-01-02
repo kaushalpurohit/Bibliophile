@@ -4,18 +4,20 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingLeft="@dimen/_20sdp"
-    android:paddingBottom="@dimen/_10sdp"
-    android:paddingRight="@dimen/_20sdp"
-    android:paddingTop="@dimen/_10sdp"
+    android:padding="@dimen/_25sdp"
     android:id="@+id/mainLayout">
+        <androidx.cardview.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            card_view:cardCornerRadius="@dimen/_4sdp">
 
-        <ImageView
-            android:id="@+id/grid_image"
-            android:layout_width="@dimen/_100sdp"
-            android:layout_height="@dimen/_160sdp"
-            android:adjustViewBounds="true"
-            android:contentDescription="@string/Book" />
+                <ImageView
+                    android:id="@+id/grid_image"
+                    android:layout_width="@dimen/_100sdp"
+                    android:layout_height="@dimen/_160sdp"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/Book" />
+        </androidx.cardview.widget.CardView>
 
         <TextView
             android:id="@+id/grid_text"
