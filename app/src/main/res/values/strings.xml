@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Bookdl</string>
+    <string name="app_name">Bibliophile</string>
     <string name="search">Search</string>
     <string name="textTitle">Title</string>
     <string name="textButton">Download</string>
@@ -7,6 +7,8 @@
     <string name="download">Download</string>
     <string name="cancel">Cancel</string>
     <string name="_0">0%</string>
+    <string name="open">open</string>
+    <string name="close">close</string>
     <string name="delete">Delete</string>
     <string name="similar_books">Similar books</string>
 </resources>

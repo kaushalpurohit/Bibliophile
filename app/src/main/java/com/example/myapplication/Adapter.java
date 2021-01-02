@@ -54,10 +54,8 @@ public class Adapter
             // initialise TextView with id
             textView = (TextView)view
                     .findViewById(R.id.grid_text);
-            pageText =  (TextView)view
-                    .findViewById(R.id.page_text);
-            sizeText =  (TextView)view
-                    .findViewById(R.id.size_text);
+            // pageText =  (TextView)view.findViewById(R.id.page_text);
+            // sizeText =  (TextView)view.findViewById(R.id.size_text);
             imageView = (ImageView) view.findViewById((R.id.grid_image));
             mainLayout = (LinearLayout) view.findViewById(R.id.mainLayout);
         }
@@ -107,8 +105,8 @@ public class Adapter
         // Set the text of each item of
         // Recycler view with the list items
             holder.textView.setText(titleList.get(position));
-            holder.pageText.setText(pageList.get(position));
-            holder.sizeText.setText(sizeList.get(position));
+            // holder.pageText.setText(pageList.get(position));
+            // holder.sizeText.setText(sizeList.get(position));
             Picasso
                     .with(mContext)
                     .load(imageList.get(position))
