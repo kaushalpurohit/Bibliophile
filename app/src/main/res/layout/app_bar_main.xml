@@ -11,12 +11,15 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:background="@drawable/gradient"
+        android:elevation="0dp"
+        android:stateListAnimator="@null"
         android:layout_height="?attr/actionBarSize">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:elevation="0dp"
         app:layout_anchor="@+id/appBarLayout"
         app:layout_anchorGravity="center">
 
