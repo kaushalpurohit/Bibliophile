@@ -1,11 +1,14 @@
 package com.example.myapplication;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,6 +30,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -73,6 +77,8 @@ public class DownloadActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_download);
         Toolbar toolbar = findViewById(R.id.searchToolbar);
@@ -128,23 +134,20 @@ public class DownloadActivity extends AppCompatActivity {
         File file = new File(dirPath);
         if (file.exists()) {
             Button downloadButton = (Button) findViewById(R.id.downloadButton);
-            Button deleteButton = (Button) findViewById(R.id.deleteButton);
+            Button readButton = (Button) findViewById(R.id.readButton);
             downloadButton.setVisibility(View.INVISIBLE);
-            deleteButton.setVisibility(View.VISIBLE);
-            deleteButton.setOnClickListener(new View.OnClickListener() {
+            readButton.setVisibility(View.VISIBLE);
+            readButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    boolean deleted = file.delete();
-                    if (deleted) {
-                        Snackbar snackBar = Snackbar .make(v, "Deleted " + title, Snackbar.LENGTH_SHORT);
-                        snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
-                        snackBar.setTextColor(Color.WHITE);
-                        downloadButton.setVisibility(View.VISIBLE);
-                        deleteButton.setVisibility(View.INVISIBLE);
-                        snackBar.show();
-                    }
-                    else {
-                        Snackbar snackBar = Snackbar .make(v, "Couldn't delete the book " + title, Snackbar.LENGTH_SHORT);
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    Uri uri = Uri.fromFile(file);
+                    intent.setDataAndType(uri, "application/pdf");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);;
+                    try {
+                        startActivity(intent);
+                    } catch (ActivityNotFoundException e) {
+                        Snackbar snackBar = Snackbar .make(v, "Install a PDF reader!", Snackbar.LENGTH_SHORT);
                         snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
                         snackBar.setTextColor(Color.WHITE);
                         snackBar.show();
@@ -400,9 +403,7 @@ public class DownloadActivity extends AppCompatActivity {
             progress.setVisibility(View.INVISIBLE);
             cancelButton.setVisibility(View.INVISIBLE);
             downloadPercent.setVisibility(View.INVISIBLE);
-            Button deleteButton = (Button) findViewById(R.id.deleteButton);
-            downloadButton.setVisibility(View.INVISIBLE);
-            deleteButton.setVisibility(View.VISIBLE);
+            checkIfFileExists();
             progress.setProgress(0);
             // Toast toast=Toast.makeText(getApplicationContext(),"Download complete. Book saved in:" + dirPath,Toast.LENGTH_LONG);
             // toast.show();
