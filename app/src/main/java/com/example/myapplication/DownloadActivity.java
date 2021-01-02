@@ -137,7 +137,7 @@ public class DownloadActivity extends AppCompatActivity {
                     boolean deleted = file.delete();
                     if (deleted) {
                         Snackbar snackBar = Snackbar .make(v, "Deleted " + title, Snackbar.LENGTH_SHORT);
-                        snackBar.setBackgroundTint(Color.parseColor("#FF03DAC5"));
+                        snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
                         snackBar.setTextColor(Color.WHITE);
                         downloadButton.setVisibility(View.VISIBLE);
                         deleteButton.setVisibility(View.INVISIBLE);
@@ -145,7 +145,7 @@ public class DownloadActivity extends AppCompatActivity {
                     }
                     else {
                         Snackbar snackBar = Snackbar .make(v, "Couldn't delete the book " + title, Snackbar.LENGTH_SHORT);
-                        snackBar.setBackgroundTint(Color.parseColor("#FF03DAC5"));
+                        snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
                         snackBar.setTextColor(Color.WHITE);
                         snackBar.show();
                     }
@@ -263,7 +263,7 @@ public class DownloadActivity extends AppCompatActivity {
             );
         }
         Snackbar snackBar = Snackbar .make(v, "Please wait", Snackbar.LENGTH_SHORT);
-        snackBar.setBackgroundTint(Color.parseColor("#FF03DAC5"));
+        snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
         snackBar.setTextColor(Color.WHITE);
         snackBar.show();
         // Toast toast=Toast.makeText(getApplicationContext(),"Please wait",Toast.LENGTH_SHORT);
@@ -325,7 +325,7 @@ public class DownloadActivity extends AppCompatActivity {
             // Toast toast=Toast.makeText(getApplicationContext(),"Downloading",Toast.LENGTH_SHORT);
             // toast.show();
             Snackbar snackBar = Snackbar .make(rootView, "Downloading", Snackbar.LENGTH_SHORT);
-            snackBar.setBackgroundTint(Color.parseColor("#FF03DAC5"));
+            snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
             snackBar.setTextColor(Color.WHITE);
             snackBar.show();
             ProgressBar progress = findViewById(R.id.progressBar);
@@ -399,13 +399,15 @@ public class DownloadActivity extends AppCompatActivity {
             downloadPercent.setText("0");
             progress.setVisibility(View.INVISIBLE);
             cancelButton.setVisibility(View.INVISIBLE);
-            downloadButton.setVisibility(View.VISIBLE);
             downloadPercent.setVisibility(View.INVISIBLE);
+            Button deleteButton = (Button) findViewById(R.id.deleteButton);
+            downloadButton.setVisibility(View.INVISIBLE);
+            deleteButton.setVisibility(View.VISIBLE);
             progress.setProgress(0);
             // Toast toast=Toast.makeText(getApplicationContext(),"Download complete. Book saved in:" + dirPath,Toast.LENGTH_LONG);
             // toast.show();
             Snackbar snackBar = Snackbar .make(rootView, "Download complete. Book saved in:" + dirPath, Snackbar.LENGTH_SHORT);
-            snackBar.setBackgroundTint(Color.parseColor("#FF03DAC5"));
+            snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
             snackBar.setTextColor(Color.WHITE);
             snackBar.show();
         }
@@ -416,7 +418,7 @@ public class DownloadActivity extends AppCompatActivity {
             // Toast toast=Toast.makeText(getApplicationContext(),"Cancelled ",Toast.LENGTH_SHORT);
             // toast.show();
             Snackbar snackBar = Snackbar .make(rootView, "Cancelled", Snackbar.LENGTH_SHORT);
-            snackBar.setBackgroundTint(Color.parseColor("#FF03DAC5"));
+            snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
             snackBar.setTextColor(Color.WHITE);
             snackBar.show();
             ProgressBar progress = findViewById(R.id.progressBar);

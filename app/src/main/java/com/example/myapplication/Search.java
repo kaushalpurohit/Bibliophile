@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
@@ -75,11 +76,16 @@ public class Search extends AppCompatActivity {
 
     public boolean search(){
         SearchView text = (SearchView) findViewById(R.id.searchBook);
+        int id = text.getContext()
+                .getResources()
+                .getIdentifier("android:id/search_src_text", null, null);
+        EditText searchEditText = (EditText) text.findViewById(id);
+        searchEditText.setTextColor(getResources().getColor(R.color.white));
+        searchEditText.setHintTextColor(getResources().getColor(R.color.white));
         text.requestFocus();
         text.setMaxWidth(Integer.MAX_VALUE);
         text.setIconified(false);
         text.setFocusable(true);
-        text.setQueryHint("search");
         text.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String search) {

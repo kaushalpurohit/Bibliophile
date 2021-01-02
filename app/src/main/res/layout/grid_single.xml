@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:paddingLeft="@dimen/_20sdp"
     android:paddingBottom="@dimen/_10sdp"
-    android:paddingRight="@dimen/_10sdp"
+    android:paddingRight="@dimen/_20sdp"
     android:paddingTop="@dimen/_10sdp"
     android:id="@+id/mainLayout">
 

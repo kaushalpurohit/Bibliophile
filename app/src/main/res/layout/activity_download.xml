@@ -161,7 +161,7 @@
 
                 <ProgressBar
                     android:id="@+id/progressBar"
-                    android:progressTint="@color/teal_200"
+                    android:progressTint="@color/purple"
                     android:progress="0"
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="@dimen/_100sdp"

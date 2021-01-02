@@ -11,4 +11,5 @@
     <string name="close">close</string>
     <string name="delete">Delete</string>
     <string name="similar_books">Similar books</string>
+    <string name="searchBooks">Search for books</string>
 </resources>
