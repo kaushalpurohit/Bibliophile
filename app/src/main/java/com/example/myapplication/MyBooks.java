@@ -32,6 +32,7 @@ import java.util.concurrent.Executors;
 public class MyBooks extends AppCompatActivity {
     public ArrayList<String> paths = new ArrayList<String>();
     public ArrayList<String> fileName = new ArrayList<String>();
+    public ArrayList<String> fileList = new ArrayList<String>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
@@ -57,7 +58,7 @@ public class MyBooks extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            MyBookAdapter adapter = new MyBookAdapter(MyBooks.this, fileName, paths);
+            MyBookAdapter adapter = new MyBookAdapter(MyBooks.this, fileName, paths, fileList);
             Log.i("File", paths.toString());
             RecyclerView recyclerView = findViewById(R.id.myBooksRecycler);
             RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(MyBooks.this, 2);
@@ -94,18 +95,17 @@ public class MyBooks extends AppCompatActivity {
     public void listFiles() {
         File file = new File(Environment.getExternalStorageDirectory() + File.separator + "Books");
         String pdfPattern = ".pdf";
-        ArrayList<String> files = new ArrayList<String>();
         File FileList[] = file.listFiles();
         if (FileList != null) {
             for (int i = 0; i < FileList.length; i++) {
 
                     if (FileList[i].getName().endsWith(pdfPattern)){
                         fileName.add(FileList[i].getName());
-                        files.add(FileList[i].getAbsolutePath());
+                        fileList.add(FileList[i].getAbsolutePath());
                     }
                 }
             }
-        createImage(files, fileName);
+        createImage(fileList, fileName);
     }
 
     public void createImage(List<String> Files, List<String> Names) {
