@@ -131,19 +131,29 @@ public class Search extends AppCompatActivity {
                                             sizeList.add(size);
                                             pageList.add(page);
                                         }
-                                        Adapter adapter = new Adapter(Search.this, imageList, titleList, pageList, sizeList, linkList);
-                                        RecyclerView recyclerView = (RecyclerView)findViewById(R.id.searchRecycler);
-                                        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(Search.this, 2);
-                                        recyclerView.setLayoutManager(mLayoutManager);
-                                        recyclerView.setAdapter(adapter);
-                                        searchRecycler.setVisibility(View.VISIBLE);
                                         container.stopShimmer();
                                         container.setVisibility(View.GONE);
+                                        Adapter adapter = new Adapter(Search.this, imageList, titleList, pageList, sizeList, linkList);
+                                        RecyclerView recyclerView = (RecyclerView)findViewById(R.id.searchRecycler);
+                                        try {
+                                            recyclerView.removeItemDecorationAt(0);
+                                        }
+                                        catch (IndexOutOfBoundsException e) {
+                                            Log.i("IO", "Search recycler index error");
+                                        }
+                                        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(Search.this, 2);
+                                        recyclerView.setLayoutManager(mLayoutManager);
+                                        int spanCount = 2; // 2 columns
+                                        int spacing = 120; // 100px
+                                        boolean includeEdge = true;
+                                        recyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge));
+                                        recyclerView.setAdapter(adapter);
                                         titleList = new ArrayList<>();
                                         linkList = new ArrayList<>();
                                         imageList = new ArrayList<>();
                                         sizeList = new ArrayList<>();
                                         pageList = new ArrayList<>();
+                                        recyclerView.setVisibility(View.VISIBLE);
                                     }
                                     catch (Exception e){
                                         Log.i("exception", "1", e);
@@ -159,6 +169,12 @@ public class Search extends AppCompatActivity {
             @Override
             public boolean onQueryTextChange(String newText) {
                 RecyclerView searchRecycler=(RecyclerView) findViewById(R.id.searchRecycler);
+                try {
+                    searchRecycler.removeItemDecorationAt(0);
+                }
+                catch (IndexOutOfBoundsException e) {
+                    Log.i("IO", "Search recycler index error");
+                }
                 searchRecycler.setAdapter(null);
                 return false;
             }

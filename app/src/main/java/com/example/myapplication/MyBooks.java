@@ -68,6 +68,16 @@ public class MyBooks extends AppCompatActivity {
             RecyclerView recyclerView = findViewById(R.id.myBooksRecycler);
             RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(MyBooks.this, 2);
             recyclerView.setLayoutManager(mLayoutManager);
+            try {
+                recyclerView.removeItemDecorationAt(0);
+            }
+            catch (IndexOutOfBoundsException e) {
+                Log.i("IO", "Search recycler index error");
+            }
+            int spanCount = 2; // 2 columns
+            int spacing = 120; // 100px
+            boolean includeEdge = true;
+            recyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge));
             recyclerView.setAdapter(adapter);
         }
     }

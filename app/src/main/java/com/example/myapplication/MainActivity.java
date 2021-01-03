@@ -135,6 +135,11 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        return false;
+    }
+
     public void createCategories() {
         String url = "https://bookdl-api.herokuapp.com/home";
         int cacheSize = 10 * 1024 * 1024;
@@ -193,6 +198,16 @@ public class MainActivity extends AppCompatActivity
                                     LinearLayoutManager RecyclerViewLayoutManager = new LinearLayoutManager(getApplicationContext());
                                     LinearLayoutManager HorizontalLayout = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false);
                                     recyclerView.setLayoutManager(HorizontalLayout);
+                                    try {
+                                        recyclerView.removeItemDecorationAt(0);
+                                    }
+                                    catch (IndexOutOfBoundsException e) {
+                                        Log.i("IO", "Search recycler index error");
+                                    }
+                                    int spanCount = 2; // 2 columns
+                                    int spacing = 80; // 50px
+                                    boolean includeEdge = true;
+                                    recyclerView.addItemDecoration(new GridSpacingItemDecoration(5, spacing, includeEdge));
                                     recyclerView.setAdapter(adapter);
                                     titleList = new ArrayList<>();
                                     imageList = new ArrayList<>();

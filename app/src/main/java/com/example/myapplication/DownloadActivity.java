@@ -224,6 +224,16 @@ public class DownloadActivity extends AppCompatActivity {
                                 }
                                 Adapter adapter = new Adapter(DownloadActivity.this, imageList, titleList, pageList, sizeList, linkList);
                                 RecyclerView recyclerView = (RecyclerView) findViewById(R.id.similar_books);
+                                try {
+                                    recyclerView.removeItemDecorationAt(0);
+                                }
+                                catch (IndexOutOfBoundsException e) {
+                                    Log.i("IO", "Search recycler index error");
+                                }
+                                int spanCount = 2; // 2 columns
+                                int spacing = 120; // 50px
+                                boolean includeEdge = true;
+                                recyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge));
                                 recyclerView.setNestedScrollingEnabled(false);
                                 //LinearLayoutManager VerticalLayout = new LinearLayoutManager(DownloadActivity.this, LinearLayoutManager.VERTICAL, false);
                                 LinearLayoutManager HorizontalLayout = new LinearLayoutManager(DownloadActivity.this, LinearLayoutManager.HORIZONTAL, false);
