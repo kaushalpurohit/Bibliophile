@@ -16,4 +16,6 @@
     <string name="mybooks">My books</string>
     <string name="my_books">My books</string>
     <string name="about">About</string>
+    <string name="edit">Edit</string>
+    <string name="done">Done</string>
 </resources>

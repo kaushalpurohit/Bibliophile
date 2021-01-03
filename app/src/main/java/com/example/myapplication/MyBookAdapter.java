@@ -1,18 +1,26 @@
 package com.example.myapplication;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.Image;
 import android.net.Uri;
+import android.os.Environment;
+import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toolbar;
 
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,6 +29,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -45,6 +54,7 @@ public class MyBookAdapter extends RecyclerView.Adapter<MyBookAdapter.MyCardView
         TextView title;
         ImageView image;
         RelativeLayout mainLayout;
+        RelativeLayout deleteIcon;
 
         // parameterised constructor for View Holder class
         // which takes the view as a parameter
@@ -56,7 +66,7 @@ public class MyBookAdapter extends RecyclerView.Adapter<MyBookAdapter.MyCardView
             title = view.findViewById(R.id.myBookTitle);
             image = view.findViewById(R.id.myBookImage);
             mainLayout = view.findViewById(R.id.MyBooksLayout);
-
+            deleteIcon = view.findViewById(R.id.delete);
         }
     }
 
@@ -96,20 +106,18 @@ public class MyBookAdapter extends RecyclerView.Adapter<MyBookAdapter.MyCardView
     // particular items of the RecyclerView.
     @Override
     public void onBindViewHolder(final MyCardView holder,
-                                 final int position)
-    {
+                                 final int position) {
 
         // Set the text of each item of
         // Recycler view with the list items
-        holder.title.setText(detailsList.get(position).substring(0,detailsList.get(position).indexOf('.')));
+        holder.title.setText(detailsList.get(position).substring(0, detailsList.get(position).indexOf('.')));
         try {
             Picasso
                     .with(mContext)
                     .load(imageList.get(position))
                     .fit() // will explain later
                     .into(holder.image);
-        }
-        catch (IndexOutOfBoundsException e) {
+        } catch (IndexOutOfBoundsException e) {
             Log.i("IO", "Recycler imageView index error");
         }
         holder.mainLayout.setOnClickListener(new View.OnClickListener() {
@@ -119,7 +127,8 @@ public class MyBookAdapter extends RecyclerView.Adapter<MyBookAdapter.MyCardView
                 File file = new File(fileList.get(position));
                 Uri uri = Uri.fromFile(file);
                 intent.setDataAndType(uri, "application/pdf");
-                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);;
+                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                ;
                 try {
                     mContext.startActivity(intent);
                 } catch (ActivityNotFoundException e) {
@@ -127,13 +136,70 @@ public class MyBookAdapter extends RecyclerView.Adapter<MyBookAdapter.MyCardView
                 }
             }
         });
+        delete(holder, position);
     }
 
-    // Override getItemCount which Returns
-    // the length of the RecyclerView.
-    @Override
-    public int getItemCount()
-    {
-        return detailsList.size();
+    public void delete(MyCardView holder, int position) {
+        holder.deleteIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                builder.setMessage("Alert!");
+
+                //Setting message manually and performing action on button click
+                builder.setMessage("Do you want to delete this book?")
+                        .setCancelable(false)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                    String path = Environment.getExternalStorageDirectory() +
+                                            File.separator + "Books" + File.separator +
+                                            detailsList.get(position);
+                                    File file = new File(path);
+                                    boolean result = file.delete();
+                                    RecyclerView recyclerView = ((Activity) mContext).findViewById(R.id.myBooksRecycler);
+                                    detailsList.remove(position);
+                                    recyclerView.removeViewAt(position);
+                                    notifyItemRemoved(position);
+                                    notifyItemRangeChanged(position, detailsList.size());
+                                    if(result) {
+                                        Log.i("Delete", "Deleted book.");
+                                    }
+                                    else {
+                                        Log.i("Delete", "Couldn't delete book.");
+                                    }
+                                dialog.cancel();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                //  Action for 'NO' Button
+                                dialog.cancel();
+                            }
+                        });
+                //Creating dialog box
+                AlertDialog alert = builder.create();
+                //Setting the title manually
+                alert.setTitle("Bibliophile");
+                alert.show();
+                int[] buttons = new int[] {AlertDialog.BUTTON_POSITIVE, AlertDialog.BUTTON_NEGATIVE, AlertDialog.BUTTON_NEUTRAL};
+                for (int i : buttons) {
+                    Button b = null;
+                    try {
+                        b = alert.getButton(i);
+                        b.setBackgroundColor(Color.TRANSPARENT);
+                        b.setTextColor(mContext.getResources().getColor(R.color.purple_200));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
     }
+        // Override getItemCount which Returns
+        // the length of the RecyclerView.
+        @Override
+        public int getItemCount ()
+        {
+            return detailsList.size();
+        }
 }

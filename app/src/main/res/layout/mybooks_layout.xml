@@ -15,6 +15,29 @@
             android:id="@+id/myBookImage"
             android:layout_width="@dimen/_100sdp"
             android:layout_height="@dimen/_160sdp"/>
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/_78sdp"
+            android:paddingTop="@dimen/_2sdp"
+            android:paddingBottom="@dimen/_10sdp"
+            android:paddingLeft="@dimen/_9sdp"
+            android:paddingRight="@dimen/_2sdp"
+            android:id="@+id/delete">
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:outlineAmbientShadowColor="@color/purple"
+                android:elevation="@dimen/_10sdp"
+                app:cardCornerRadius="@dimen/_40sdp">
+                <ImageView
+                    android:layout_width="@dimen/_10sdp"
+                    android:layout_height="@dimen/_10sdp"
+                    android:layout_alignParentRight="true"
+                    android:src="@drawable/delete"
+                    android:background="#FFFFFF"/>
+            </androidx.cardview.widget.CardView>
+        </RelativeLayout>
     </androidx.cardview.widget.CardView>
     <TextView
         android:id="@+id/myBookTitle"
