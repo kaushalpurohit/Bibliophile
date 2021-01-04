@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/searchToolbar"
+        android:layout_width="match_parent"
+        android:layout_height = "?attr/actionBarSize"
+        app:navigationIcon="?attr/homeAsUpIndicator"
+        android:background = "#2F0743">
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <RelativeLayout
+                android:layout_width="@dimen/_220sdp"
+                android:layout_height="match_parent">
+                <TextView
+                    android:id="@+id/categoryTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:textSize="@dimen/_15sdp"/>
+            </RelativeLayout>
+            <SearchView
+                android:id="@+id/searchBook"
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:iconifiedByDefault="true" />
+        </RelativeLayout>
+    </androidx.appcompat.widget.Toolbar>
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:layout_marginTop="?attr/actionBarSize"
+        android:id="@+id/shimmer_view_container_search"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        app:shimmer_auto_start="false"
+        android:visibility="gone">
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <include layout="@layout/shimmer_card"></include>
+                <include layout="@layout/shimmer_card"></include>
+                <include layout="@layout/shimmer_card"></include>
+                <include layout="@layout/shimmer_card"></include>
+                <include layout="@layout/shimmer_card"></include>
+            </LinearLayout>
+        </ScrollView>
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_marginTop="?attr/actionBarSize"
+        android:visibility="gone"
+        android:id="@+id/searchRecycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager" />
+
+</RelativeLayout>

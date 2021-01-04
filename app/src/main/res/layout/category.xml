@@ -14,7 +14,8 @@
         android:layout_marginLeft="@dimen/_10sdp"
         android:layout_marginRight="@dimen/_10sdp"
         android:layout_marginBottom="@dimen/_15sdp"
-        android:textSize="12sp"
+        android:textSize="10sp"
+        android:padding="@dimen/_4sdp"
         android:textColor="#2F0743"
         android:text="Button" />
 </RelativeLayout>

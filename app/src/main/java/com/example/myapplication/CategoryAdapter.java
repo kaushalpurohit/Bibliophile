@@ -3,6 +3,7 @@ package com.example.myapplication;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 import android.view.View;
@@ -83,6 +84,14 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.MyButt
         // Set the text of each item of
         // Recycler view with the list items
         holder.cat.setText(detailsList.get(position));
+        holder.cat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent category = new Intent(mContext, Category.class);
+                category.putExtra("title", detailsList.get(position));
+                mContext.startActivity(category);
+            }
+        });
     }
 
     // Override getItemCount which Returns

@@ -148,14 +148,14 @@
                     android:textSize="28sp"
                     android:layout_marginLeft="@dimen/_10sdp"
                     android:layout_marginStart="@dimen/_10sdp"
-                    android:layout_marginTop="@dimen/_265sdp"/>
+                    android:layout_marginTop="@dimen/_285sdp"/>
 
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/similar_books"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/_295sdp"
+                    android:layout_marginTop="@dimen/_305sdp"
                     app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                     app:spanCount="2" />
 

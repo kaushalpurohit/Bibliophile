@@ -239,7 +239,7 @@ public class DownloadActivity extends AppCompatActivity {
                                 LinearLayoutManager HorizontalLayout = new LinearLayoutManager(DownloadActivity.this, LinearLayoutManager.HORIZONTAL, false);
                                 //recyclerView.setLayoutManager(VerticalLayout);
                                 textAdapter infoAdapter = new textAdapter(DownloadActivity.this, infoList);
-                                textAdapter tagAdapter = new textAdapter(DownloadActivity.this, tagList);
+                                CategoryAdapter tagAdapter = new CategoryAdapter(DownloadActivity.this, tagList);
                                 RecyclerView infoRecyclerView = (RecyclerView) findViewById(R.id.info);
                                 RecyclerView tagRecyclerView = (RecyclerView) findViewById(R.id.tag);
                                 LinearLayoutManager NewVerticalLayout = new LinearLayoutManager(DownloadActivity.this, LinearLayoutManager.VERTICAL, false);
