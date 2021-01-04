@@ -152,15 +152,25 @@ public class MyBookAdapter extends RecyclerView.Adapter<MyBookAdapter.MyCardView
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                     String path = Environment.getExternalStorageDirectory() +
-                                            File.separator + "Books" + File.separator +
-                                            detailsList.get(position);
-                                    File file = new File(path);
+                                            File.separator + "Books" + File.separator ;
+                                    String filePath = path + detailsList.get(position);
+                                    String imagePath = path + File.separator + "Images" + File.separator +
+                                            detailsList.get(position).substring(0, detailsList.get(position).indexOf('.'))
+                                            + ".png";
+                                    File file = new File(filePath);
+                                    File image = new File(imagePath);
+                                    if(image.exists()){
+                                        boolean imageResult = image.delete();
+                                    };
                                     boolean result = file.delete();
                                     RecyclerView recyclerView = ((Activity) mContext).findViewById(R.id.myBooksRecycler);
                                     detailsList.remove(position);
+                                    imageList.remove(position);
+                                    fileList.remove(position);
                                     recyclerView.removeViewAt(position);
                                     notifyItemRemoved(position);
                                     notifyItemRangeChanged(position, detailsList.size());
+                                    notifyDataSetChanged();
                                     if(result) {
                                         Log.i("Delete", "Deleted book.");
                                     }

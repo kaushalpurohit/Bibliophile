@@ -78,6 +78,8 @@
                     android:id="@+id/download_title"
                     android:layout_width="@dimen/_120sdp"
                     android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="4"
                     android:textStyle="bold"
                     android:textSize="12sp"
                     android:layout_marginLeft="@dimen/_180sdp"

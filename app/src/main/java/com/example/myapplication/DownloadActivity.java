@@ -2,6 +2,7 @@ package com.example.myapplication;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
@@ -9,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,6 +24,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.shimmer.ShimmerFrameLayout;
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.ActionViewTarget;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -66,6 +71,7 @@ public class DownloadActivity extends AppCompatActivity {
     private String link = "";
     private String title = "";
     private String download_url = "";
+    private String finalDownloadUrl = "";
     private List<String> infoList = new ArrayList<>();
     private List<String> tagList = new ArrayList<>();
     private List<String> titleList = new ArrayList<>();
@@ -101,6 +107,30 @@ public class DownloadActivity extends AppCompatActivity {
             }
         });
     }
+    public void firstRun(){
+        SharedPreferences wmbPreference = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean isFirstRun = wmbPreference.getBoolean("FIRSTRUN", true);
+        if (isFirstRun)
+        {
+            // Code to run once
+            SharedPreferences.Editor editor = wmbPreference.edit();
+            editor.putBoolean("FIRSTRUN", false);
+            //editor.commit();
+            editor.apply();
+            showcase();
+        }
+    }
+
+    public void showcase(){
+        ViewTarget target = new ViewTarget(findViewById(R.id.download_image));
+        new ShowcaseView.Builder(this)
+                .setTarget(target)
+                .setContentTitle("New feature!")
+                .setContentText("Tap on the image to read the book online.")
+                .hideOnTouchOutside()
+                .build()
+        .show();
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -110,6 +140,60 @@ public class DownloadActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void preview() {
+        ImageView image = findViewById(R.id.download_image);
+        image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Snackbar snackBar = Snackbar .make(v, "Please wait", Snackbar.LENGTH_SHORT);
+                snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
+                snackBar.setTextColor(Color.WHITE);
+                snackBar.show();
+                int cacheSize = 10 * 1024 * 1024;
+                File httpCacheDirectory = new File(getApplicationContext().getCacheDir(), "http-cache");
+                Cache cache = new Cache(httpCacheDirectory, cacheSize);
+                String url = "https://bookdl-api.herokuapp.com/download?url=" + download_url;
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .addNetworkInterceptor(new CacheInterceptor())
+                        .cache(cache)
+                        .build();
+                Request request = new Request.Builder()
+                        .url(url)
+                        .build();
+                client.newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        if (response.isSuccessful()) {
+                            final String myResponse = response.body().string();
+                            DownloadActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        JSONObject res = new JSONObject(myResponse);
+                                        //String finalDownloadUrl = res.getString("link");
+                                        finalDownloadUrl = res.getString("link");
+                                        Log.i("finalUrl", finalDownloadUrl);
+                                        Intent preview = new Intent(DownloadActivity.this, Preview.class);
+                                        preview.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                                        preview.putExtra("link", finalDownloadUrl);
+                                        startActivity(preview);
+                                    } catch (Exception e) {
+                                        Log.i("exception", "1", e);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        });
     }
 
     public boolean search() {
@@ -252,6 +336,7 @@ public class DownloadActivity extends AppCompatActivity {
                                 container.setVisibility(View.GONE);
                                 androidx.core.widget.NestedScrollView homeLayout = (androidx.core.widget.NestedScrollView) findViewById(R.id.download_scroll);
                                 homeLayout.setVisibility(View.VISIBLE);
+                                firstRun();
                             }
                             catch (Exception e){
                                 Log.i("exception", "1", e);
@@ -297,7 +382,7 @@ public class DownloadActivity extends AppCompatActivity {
                             try {
                                 JSONObject res = new JSONObject(myResponse);
                                 //String finalDownloadUrl = res.getString("link");
-                                String finalDownloadUrl = res.getString("link");
+                                finalDownloadUrl = res.getString("link");
                                 Log.i("finalUrl", finalDownloadUrl);
                                 DownloadFile myTask = new DownloadFile();
                                 myTask.execute(finalDownloadUrl);

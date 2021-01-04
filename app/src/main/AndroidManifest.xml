@@ -20,6 +20,7 @@
             android:parentActivityName=".MainActivity"/>
         <activity android:name=".MyBooks"/>
         <activity android:name=".Category"/>
+        <activity android:name=".Preview"/>
         <activity android:name=".MainActivity" />
         <activity android:name=".DownloadActivity"
             android:parentActivityName=".MainActivity"/>

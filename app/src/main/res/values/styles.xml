@@ -11,5 +11,18 @@
     <style name="SplashScreenTheme" parent = "Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@drawable/splash_screen</item>
     </style>
+    <style name="TextAppearance.ShowcaseView.Detail" parent="android:style/TextAppearance">
+        <item name="android:textSize">@dimen/_20sdp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+    <style name="TextAppearance.ShowcaseView.Title" parent="android:style/TextAppearance">
+        <item name="android:textSize">@dimen/_30sdp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@android:color/holo_blue_bright</item>
+    </style>
+    <style name="ShowcaseView">
+        <item name="sv_backgroundColor">@color/purple_500</item>
+    </style>
 
 </resources>
