@@ -106,6 +106,7 @@ public class DownloadActivity extends AppCompatActivity {
                 download(v);
             }
         });
+        preview();
     }
     public void firstRun(){
         SharedPreferences wmbPreference = PreferenceManager.getDefaultSharedPreferences(this);
