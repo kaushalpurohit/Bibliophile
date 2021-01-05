@@ -137,7 +137,7 @@ public class Category extends AppCompatActivity {
                                 RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(Category.this, 2);
                                 recyclerView.setLayoutManager(mLayoutManager);
                                 int spanCount = 2; // 2 columns
-                                int spacing = 120; // 100px
+                                int spacing = getResources().getDimensionPixelSize(R.dimen._35sdp); // 100px
                                 boolean includeEdge = true;
                                 recyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge));
                                 recyclerView.setAdapter(adapter);

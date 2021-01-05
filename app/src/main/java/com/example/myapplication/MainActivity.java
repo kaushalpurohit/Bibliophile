@@ -205,7 +205,7 @@ public class MainActivity extends AppCompatActivity
                                         Log.i("IO", "Search recycler index error");
                                     }
                                     int spanCount = 2; // 2 columns
-                                    int spacing = 80; // 50px
+                                    int spacing = getResources().getDimensionPixelSize(R.dimen._35sdp); // 100px
                                     boolean includeEdge = true;
                                     recyclerView.addItemDecoration(new GridSpacingItemDecoration(5, spacing, includeEdge));
                                     recyclerView.setAdapter(adapter);
