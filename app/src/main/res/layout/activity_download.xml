@@ -75,6 +75,14 @@
                 </androidx.cardview.widget.CardView>
 
                 <TextView
+                    android:id="@+id/share"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/share"
+                    android:layout_marginTop="@dimen/_180sdp"
+                    android:layout_marginLeft="@dimen/_280sdp"/>
+
+                <TextView
                     android:id="@+id/download_title"
                     android:layout_width="@dimen/_120sdp"
                     android:layout_height="wrap_content"

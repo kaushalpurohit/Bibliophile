@@ -53,9 +53,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.security.spec.EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import okhttp3.Cache;
 import okhttp3.Call;
@@ -107,6 +109,7 @@ public class DownloadActivity extends AppCompatActivity {
             }
         });
         preview();
+        share();
     }
     public void firstRun(){
         SharedPreferences wmbPreference = PreferenceManager.getDefaultSharedPreferences(this);
@@ -400,6 +403,65 @@ public class DownloadActivity extends AppCompatActivity {
                         }
                     });
                 }
+            }
+        });
+    }
+
+    public void share() {
+        TextView share = findViewById(R.id.share);
+        share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Snackbar snackBar = Snackbar .make(v, "Please wait", Snackbar.LENGTH_SHORT);
+                snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
+                snackBar.setTextColor(Color.WHITE);
+                snackBar.show();
+                // Toast toast=Toast.makeText(getApplicationContext(),"Please wait",Toast.LENGTH_SHORT);
+                // toast.show();
+                int cacheSize = 10 * 1024 * 1024;
+                File httpCacheDirectory = new File(getApplicationContext().getCacheDir(), "http-cache");
+                Cache cache = new Cache(httpCacheDirectory, cacheSize);
+                String url = "https://bookdl-api.herokuapp.com/download?url=" + download_url;
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .addNetworkInterceptor(new CacheInterceptor())
+                        .cache(cache)
+                        .build();
+                Request request = new Request.Builder()
+                        .url(url)
+                        .build();
+                client.newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        if (response.isSuccessful()) {
+                            final String myResponse = response.body().string();
+                            DownloadActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        JSONObject res = new JSONObject(myResponse);
+                                        //String finalDownloadUrl = res.getString("link");
+                                        finalDownloadUrl = res.getString("link");
+                                        Log.i("finalUrl", finalDownloadUrl);
+                                        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                                        sharingIntent.setType("text/plain");
+                                        String shareBody = "Hi there! I would like to share this book with you.\n\n";
+                                        shareBody += finalDownloadUrl.trim();
+                                        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Bibliophile");
+                                        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                                        startActivity(Intent.createChooser(sharingIntent, "Share via"));
+                                    } catch (Exception e) {
+                                        Log.i("exception", "1", e);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
             }
         });
     }
