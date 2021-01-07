@@ -18,13 +18,13 @@
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/_58sdp"
+            android:layout_marginLeft="@dimen/_52sdp"
             android:paddingTop="@dimen/_2sdp"
             android:paddingBottom="@dimen/_20sdp"
             android:paddingLeft="@dimen/_30sdp"
             android:paddingRight="@dimen/_2sdp"
             android:id="@+id/delete"
-            android:layout_marginStart="@dimen/_58sdp"
+            android:layout_marginStart="@dimen/_52sdp"
             android:paddingEnd="@dimen/_2sdp"
             android:paddingStart="@dimen/_30sdp">
             <androidx.cardview.widget.CardView

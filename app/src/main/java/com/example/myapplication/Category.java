@@ -138,7 +138,7 @@ public class Category extends AppCompatActivity {
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(Category.this, 2);
         recyclerView.setLayoutManager(mLayoutManager);
         int spanCount = 2;
-        int spacing = getResources().getDimensionPixelSize(R.dimen._35sdp);
+        int spacing = getResources().getDimensionPixelSize(R.dimen._34sdp);
         recyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, true));
         recyclerView.setAdapter(adapter);
         titleList = new ArrayList<>();

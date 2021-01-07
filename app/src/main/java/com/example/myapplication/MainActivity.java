@@ -207,8 +207,8 @@ public class MainActivity extends AppCompatActivity
         catch (IndexOutOfBoundsException e) {
             Log.i("IO", "Search recycler index error");
         }
-        int spanCount = 5;
-        int spacing = getResources().getDimensionPixelSize(R.dimen._35sdp);
+        int spanCount = 4;
+        int spacing = getResources().getDimensionPixelSize(R.dimen._28sdp);
         recyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, true));
         recyclerView.setAdapter(adapter);
         titleList = new ArrayList<>();

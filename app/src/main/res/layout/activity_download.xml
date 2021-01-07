@@ -81,7 +81,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/share"
                     android:layout_marginTop="@dimen/_180sdp"
-                    android:layout_marginLeft="@dimen/_280sdp"/>
+                    android:layout_marginLeft="@dimen/_275sdp"/>
 
                 <TextView
                     android:id="@+id/download_title"
