@@ -233,6 +233,7 @@ public class MainActivity extends AppCompatActivity
         category.add("Romance");
         category.add("Suspense");
         category.add("Thriller");
+        category.add("Mystery");
         CategoryAdapter adapter = new CategoryAdapter(MainActivity.this, category);
         RecyclerView recyclerView = (RecyclerView)findViewById(R.id.category);
         LinearLayoutManager HorizontalLayout = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false);

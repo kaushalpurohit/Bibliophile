@@ -22,7 +22,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/download"
-                    android:layout_centerInParent="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
                     android:textSize="@dimen/_15sdp"/>
             </RelativeLayout>
             <SearchView
@@ -126,6 +127,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/download"
+                    android:textSize="@dimen/_9sdp"
                     android:layout_marginLeft="@dimen/_180sdp"
                     android:layout_marginStart="@dimen/_180sdp"
                     android:layout_marginTop="@dimen/_170sdp" />
@@ -135,6 +137,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/read"
+                    android:textSize="@dimen/_9sdp"
                     android:layout_marginLeft="@dimen/_180sdp"
                     android:layout_marginStart="@dimen/_180sdp"
                     android:layout_marginTop="@dimen/_170sdp"
@@ -145,6 +148,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/cancel"
+                    android:textSize="@dimen/_9sdp"
                     android:layout_marginLeft="@dimen/_180sdp"
                     android:layout_marginStart="@dimen/_180sdp"
                     android:layout_marginTop="@dimen/_170sdp"

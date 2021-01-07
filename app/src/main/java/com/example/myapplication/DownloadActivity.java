@@ -1,9 +1,9 @@
 package com.example.myapplication;
 
+import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -12,39 +12,27 @@ import android.os.Environment;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.github.amlcurran.showcaseview.ShowcaseView;
-import com.github.amlcurran.showcaseview.targets.ActionViewTarget;
 import com.github.amlcurran.showcaseview.targets.ViewTarget;
-import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.FileProvider;
-import androidx.core.view.GravityCompat;
-import androidx.core.widget.NestedScrollView;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -53,11 +41,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
-import java.security.spec.EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Cache;
 import okhttp3.Call;
@@ -66,21 +53,22 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-
 public class DownloadActivity extends AppCompatActivity {
     private String link = "";
     private String title = "";
     private String download_url = "";
     private String finalDownloadUrl = "";
-    private List<String> infoList = new ArrayList<>();
-    private List<String> tagList = new ArrayList<>();
-    private List<String> titleList = new ArrayList<>();
-    private List<String> linkList = new ArrayList<>();
-    private List<String> imageList = new ArrayList<>();
-    private List<String> sizeList = new ArrayList<>();
-    private List<String> pageList = new ArrayList<>();
+    public final int cacheSize = 10 * 1024 * 1024;
+    public File httpCacheDirectory;
+    public Cache cache = null;
+    public OkHttpClient client = null;
+    private final List<String> infoList = new ArrayList<>();
+    private final List<String> tagList = new ArrayList<>();
+    private final List<String> titleList = new ArrayList<>();
+    private final List<String> linkList = new ArrayList<>();
+    private final List<String> imageList = new ArrayList<>();
+    private final List<String> sizeList = new ArrayList<>();
+    private final List<String> pageList = new ArrayList<>();
     private ShimmerFrameLayout container;
 
     @Override
@@ -91,34 +79,39 @@ public class DownloadActivity extends AppCompatActivity {
         setContentView(R.layout.activity_download);
         Toolbar toolbar = findViewById(R.id.searchToolbar);
         setSupportActionBar(toolbar);
+        Objects.requireNonNull(getSupportActionBar());
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+        httpCacheDirectory = new File(getApplicationContext().getCacheDir(), "http-cache");
+        cache = new Cache(httpCacheDirectory, cacheSize);
+        client =  new OkHttpClient.Builder()
+                .addNetworkInterceptor(new CacheInterceptor())
+                .connectTimeout(15, TimeUnit.SECONDS)
+                .readTimeout(15, TimeUnit.SECONDS)
+                .writeTimeout(15, TimeUnit.SECONDS)
+                .cache(cache)
+                .build();
         search();
         Intent intent = getIntent();
         link = intent.getStringExtra("url");
         title = intent.getStringExtra("title");
-        container = (ShimmerFrameLayout) findViewById(R.id.shimmer_view_container_download);
+        container = findViewById(R.id.shimmer_view_container_download);
         container.startShimmer();
         checkIfFileExists();
         displayData();
         Button downloadButton = findViewById(R.id.downloadButton);
-        downloadButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                download(v);
-            }
-        });
+        downloadButton.setOnClickListener(this::download);
         preview();
         share();
     }
     public void firstRun(){
         SharedPreferences wmbPreference = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean isFirstRun = wmbPreference.getBoolean("FIRSTRUN", true);
+        boolean isFirstRun = wmbPreference.getBoolean("UPDATE", true);
         if (isFirstRun)
         {
             // Code to run once
             SharedPreferences.Editor editor = wmbPreference.edit();
-            editor.putBoolean("FIRSTRUN", false);
+            editor.putBoolean("UPDATE", false);
             //editor.commit();
             editor.apply();
             showcase();
@@ -126,11 +119,11 @@ public class DownloadActivity extends AppCompatActivity {
     }
 
     public void showcase(){
-        ViewTarget target = new ViewTarget(findViewById(R.id.download_image));
+        ViewTarget target = new ViewTarget(findViewById(R.id.share));
         new ShowcaseView.Builder(this)
                 .setTarget(target)
                 .setContentTitle("New feature!")
-                .setContentText("Tap on the image to read the book online.")
+                .setContentText("Tap here to share the book.")
                 .hideOnTouchOutside()
                 .build()
         .show();
@@ -148,72 +141,54 @@ public class DownloadActivity extends AppCompatActivity {
 
     public void preview() {
         ImageView image = findViewById(R.id.download_image);
-        image.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Snackbar snackBar = Snackbar .make(v, "Please wait", Snackbar.LENGTH_SHORT);
-                snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
-                snackBar.setTextColor(Color.WHITE);
-                snackBar.show();
-                int cacheSize = 10 * 1024 * 1024;
-                File httpCacheDirectory = new File(getApplicationContext().getCacheDir(), "http-cache");
-                Cache cache = new Cache(httpCacheDirectory, cacheSize);
-                String url = "https://bookdl-api.herokuapp.com/download?url=" + download_url;
-                OkHttpClient client = new OkHttpClient.Builder()
-                        .addNetworkInterceptor(new CacheInterceptor())
-                        .cache(cache)
-                        .build();
-                Request request = new Request.Builder()
-                        .url(url)
-                        .build();
-                client.newCall(request).enqueue(new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        e.printStackTrace();
-                    }
+        image.setOnClickListener(v -> {
+            Snackbar snackBar = Snackbar .make(v, "Please wait", Snackbar.LENGTH_SHORT);
+            snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
+            snackBar.setTextColor(Color.WHITE);
+            snackBar.show();
+            String url = "https://bookdl-api.herokuapp.com/download?url=" + download_url;
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call,@NotNull IOException e) {
+                    e.printStackTrace();
+                }
 
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        if (response.isSuccessful()) {
-                            final String myResponse = response.body().string();
-                            DownloadActivity.this.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        JSONObject res = new JSONObject(myResponse);
-                                        //String finalDownloadUrl = res.getString("link");
-                                        finalDownloadUrl = res.getString("link");
-                                        Log.i("finalUrl", finalDownloadUrl);
-                                        Intent preview = new Intent(DownloadActivity.this, Preview.class);
-                                        preview.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                                        preview.putExtra("link", finalDownloadUrl);
-                                        startActivity(preview);
-                                    } catch (Exception e) {
-                                        Log.i("exception", "1", e);
-                                    }
-                                }
-                            });
-                        }
+                @Override
+                public void onResponse(@NotNull Call call,@NotNull Response response) throws IOException {
+                    if (response.isSuccessful()) {
+                        final String myResponse = Objects.requireNonNull(response.body()).string();
+                        DownloadActivity.this.runOnUiThread(() -> {
+                            try {
+                                JSONObject res = new JSONObject(myResponse);
+                                finalDownloadUrl = res.getString("link");
+                                Log.i("finalUrl", finalDownloadUrl);
+                                Intent preview = new Intent(DownloadActivity.this, Preview.class);
+                                preview.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                                preview.putExtra("link", finalDownloadUrl);
+                                startActivity(preview);
+                            } catch (Exception e) {
+                                Log.i("exception", "1", e);
+                            }
+                        });
                     }
-                });
-            }
+                }
+            });
         });
     }
 
-    public boolean search() {
+    public void search() {
         SearchView text = findViewById(R.id.searchBook);
         text.setIconifiedByDefault(true);
         text.setQueryHint("search");
-        text.setOnSearchClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View V) {
-                text.setIconified(true);
-                Intent search = new Intent(DownloadActivity.this, Search.class);
-                search.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(search);
-            }
+        text.setOnSearchClickListener(V -> {
+            text.setIconified(true);
+            Intent search = new Intent(DownloadActivity.this, Search.class);
+            search.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(search);
         });
-        return true;
     }
 
     public void checkIfFileExists(){
@@ -221,25 +196,22 @@ public class DownloadActivity extends AppCompatActivity {
         dirPath = dirPath + File.separator + title + ".pdf";
         File file = new File(dirPath);
         if (file.exists()) {
-            Button downloadButton = (Button) findViewById(R.id.downloadButton);
-            Button readButton = (Button) findViewById(R.id.readButton);
+            Button downloadButton = findViewById(R.id.downloadButton);
+            Button readButton = findViewById(R.id.readButton);
             downloadButton.setVisibility(View.INVISIBLE);
             readButton.setVisibility(View.VISIBLE);
-            readButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    Uri uri = Uri.fromFile(file);
-                    intent.setDataAndType(uri, "application/pdf");
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);;
-                    try {
-                        startActivity(intent);
-                    } catch (ActivityNotFoundException e) {
-                        Snackbar snackBar = Snackbar .make(v, "Install a PDF reader!", Snackbar.LENGTH_SHORT);
-                        snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
-                        snackBar.setTextColor(Color.WHITE);
-                        snackBar.show();
-                    }
+            readButton.setOnClickListener(v -> {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                Uri uri = Uri.fromFile(file);
+                intent.setDataAndType(uri, "application/pdf");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                try {
+                    startActivity(intent);
+                } catch (ActivityNotFoundException e) {
+                    Snackbar snackBar = Snackbar .make(v, "Install a PDF reader!", Snackbar.LENGTH_SHORT);
+                    snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
+                    snackBar.setTextColor(Color.WHITE);
+                    snackBar.show();
                 }
             });
         }
@@ -248,103 +220,92 @@ public class DownloadActivity extends AppCompatActivity {
 
     public void displayData() {
         String url = "https://bookdl-api.herokuapp.com/download_page?url=" + link;
-        TextView textView = (TextView) findViewById(R.id.download_title);
+        TextView textView = findViewById(R.id.download_title);
         textView.setText(title);
-        int cacheSize = 10 * 1024 * 1024;
-        File httpCacheDirectory = new File(getApplicationContext().getCacheDir(), "http-cache");
-        Cache cache = new Cache(httpCacheDirectory, cacheSize);
-        OkHttpClient client = new OkHttpClient.Builder()
-                .addNetworkInterceptor(new CacheInterceptor())
-                .cache(cache)
-                .build();
         Request request = new Request.Builder()
                 .url(url)
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NotNull Call call,@NotNull IOException e) {
                 e.printStackTrace();
             }
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(@NotNull Call call,@NotNull Response response) throws IOException {
                 if (response.isSuccessful()) {
-                    final String myResponse = response.body().string();
-                    DownloadActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                JSONObject res = new JSONObject(myResponse);
-                                String image = res.getString("image");
-                                Log.i("image", image);
-                                ImageView imageView = (ImageView) findViewById(R.id.download_image);
-                                Picasso
-                                        .with(DownloadActivity.this)
-                                        .load(image)
-                                        .fit() // will explain later
-                                        .into(imageView);
-                                download_url  = res.getString("download_url");
-                                JSONArray info= res.getJSONArray("info");
-                                JSONArray tags = res.getJSONArray("tags");
-                                for (int i = 0; i<4; i++) {
-                                    infoList.add(info.getString(i));
+                    final String myResponse = Objects.requireNonNull(response.body()).string();
+                    DownloadActivity.this.runOnUiThread(() -> {
+                        try {
+                            JSONObject res = new JSONObject(myResponse);
+                            String image = res.getString("image");
+                            Log.i("image", image);
+                            ImageView imageView = findViewById(R.id.download_image);
+                            Picasso
+                                    .with(DownloadActivity.this)
+                                    .load(image)
+                                    .fit() // will explain later
+                                    .into(imageView);
+                            download_url  = res.getString("download_url");
+                            JSONArray info= res.getJSONArray("info");
+                            JSONArray tags = res.getJSONArray("tags");
+                            for (int i = 0; i<4; i++) {
+                                infoList.add(info.getString(i));
+                            }
+                            for(int i = 0; i<4; i++){
+                                try{
+                                    tagList.add(tags.getString(i));
                                 }
-                                for(int i = 0; i<4; i++){
-                                    try{
-                                        tagList.add(tags.getString(i));
-                                    }
-                                    catch (Exception e){
-                                        Log.i("Exception", "Length");
-                                    }
+                                catch (Exception e){
+                                    Log.i("Exception", "Length");
                                 }
-                                JSONObject similarBooks = res.getJSONObject("similar_books");
-                                for (int i = 0; i < 7; i++ ) {
-                                    try {
-                                        JSONObject index = similarBooks.getJSONObject(String.valueOf(i));
-                                        titleList.add(index.getString("title"));
-                                        linkList.add(index.getString("url"));
-                                        imageList.add(index.getString("image"));
-                                        sizeList.add(index.getString("size"));
-                                        pageList.add(index.getString("pages"));
-                                    }
-                                    catch (Exception e) {
-                                        Log.i("Exception", e.toString());
-                                    }
-                                }
-                                Adapter adapter = new Adapter(DownloadActivity.this, imageList, titleList, pageList, sizeList, linkList);
-                                RecyclerView recyclerView = (RecyclerView) findViewById(R.id.similar_books);
+                            }
+                            JSONObject similarBooks = res.getJSONObject("similar_books");
+                            for (int i = 0; i < 7; i++ ) {
                                 try {
-                                    recyclerView.removeItemDecorationAt(0);
+                                    JSONObject index = similarBooks.getJSONObject(String.valueOf(i));
+                                    titleList.add(index.getString("title"));
+                                    linkList.add(index.getString("url"));
+                                    imageList.add(index.getString("image"));
+                                    sizeList.add(index.getString("size"));
+                                    pageList.add(index.getString("pages"));
                                 }
-                                catch (IndexOutOfBoundsException e) {
-                                    Log.i("IO", "Search recycler index error");
+                                catch (Exception e) {
+                                    Log.i("Exception", e.toString());
                                 }
-                                int spanCount = 2; // 2 columns
-                                int spacing = getResources().getDimensionPixelSize(R.dimen._35sdp); // 100px
-                                boolean includeEdge = true;
-                                recyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge));
-                                recyclerView.setNestedScrollingEnabled(false);
-                                //LinearLayoutManager VerticalLayout = new LinearLayoutManager(DownloadActivity.this, LinearLayoutManager.VERTICAL, false);
-                                LinearLayoutManager HorizontalLayout = new LinearLayoutManager(DownloadActivity.this, LinearLayoutManager.HORIZONTAL, false);
-                                //recyclerView.setLayoutManager(VerticalLayout);
-                                textAdapter infoAdapter = new textAdapter(DownloadActivity.this, infoList);
-                                CategoryAdapter tagAdapter = new CategoryAdapter(DownloadActivity.this, tagList);
-                                RecyclerView infoRecyclerView = (RecyclerView) findViewById(R.id.info);
-                                RecyclerView tagRecyclerView = (RecyclerView) findViewById(R.id.tag);
-                                LinearLayoutManager NewVerticalLayout = new LinearLayoutManager(DownloadActivity.this, LinearLayoutManager.VERTICAL, false);
-                                infoRecyclerView.setLayoutManager(NewVerticalLayout);
-                                tagRecyclerView.setLayoutManager(HorizontalLayout);
-                                infoRecyclerView.setAdapter(infoAdapter);
-                                recyclerView.setAdapter(adapter);
-                                tagRecyclerView.setAdapter(tagAdapter);
-                                container.stopShimmer();
-                                container.setVisibility(View.GONE);
-                                androidx.core.widget.NestedScrollView homeLayout = (androidx.core.widget.NestedScrollView) findViewById(R.id.download_scroll);
-                                homeLayout.setVisibility(View.VISIBLE);
-                                firstRun();
                             }
-                            catch (Exception e){
-                                Log.i("exception", "1", e);
+                            Adapter adapter = new Adapter(DownloadActivity.this, imageList, titleList, pageList, sizeList, linkList);
+                            RecyclerView recyclerView = findViewById(R.id.similar_books);
+                            try {
+                                recyclerView.removeItemDecorationAt(0);
                             }
+                            catch (IndexOutOfBoundsException e) {
+                                Log.i("IO", "Search recycler index error");
+                            }
+                            int spanCount = 2;
+                            int spacing = getResources().getDimensionPixelSize(R.dimen._35sdp);
+                            recyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, true));
+                            recyclerView.setNestedScrollingEnabled(false);
+                            //LinearLayoutManager VerticalLayout = new LinearLayoutManager(DownloadActivity.this, LinearLayoutManager.VERTICAL, false);
+                            LinearLayoutManager HorizontalLayout = new LinearLayoutManager(DownloadActivity.this, LinearLayoutManager.HORIZONTAL, false);
+                            //recyclerView.setLayoutManager(VerticalLayout);
+                            textAdapter infoAdapter = new textAdapter(DownloadActivity.this, infoList);
+                            CategoryAdapter tagAdapter = new CategoryAdapter(DownloadActivity.this, tagList);
+                            RecyclerView infoRecyclerView = findViewById(R.id.info);
+                            RecyclerView tagRecyclerView = findViewById(R.id.tag);
+                            LinearLayoutManager NewVerticalLayout = new LinearLayoutManager(DownloadActivity.this, LinearLayoutManager.VERTICAL, false);
+                            infoRecyclerView.setLayoutManager(NewVerticalLayout);
+                            tagRecyclerView.setLayoutManager(HorizontalLayout);
+                            infoRecyclerView.setAdapter(infoAdapter);
+                            recyclerView.setAdapter(adapter);
+                            tagRecyclerView.setAdapter(tagAdapter);
+                            container.stopShimmer();
+                            container.setVisibility(View.GONE);
+                            androidx.core.widget.NestedScrollView homeLayout = findViewById(R.id.download_scroll);
+                            homeLayout.setVisibility(View.VISIBLE);
+                            firstRun();
+                        }
+                        catch (Exception e){
+                            Log.i("exception", "1", e);
                         }
                     });
                 }
@@ -357,49 +318,31 @@ public class DownloadActivity extends AppCompatActivity {
         snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
         snackBar.setTextColor(Color.WHITE);
         snackBar.show();
-        // Toast toast=Toast.makeText(getApplicationContext(),"Please wait",Toast.LENGTH_SHORT);
-        // toast.show();
-        int cacheSize = 10 * 1024 * 1024;
-        File httpCacheDirectory = new File(getApplicationContext().getCacheDir(), "http-cache");
-        Cache cache = new Cache(httpCacheDirectory, cacheSize);
         String url = "https://bookdl-api.herokuapp.com/download?url=" + download_url;
-        OkHttpClient client = new OkHttpClient.Builder()
-                .addNetworkInterceptor(new CacheInterceptor())
-                .cache(cache)
-                .build();
         Request request = new Request.Builder()
                 .url(url)
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NotNull Call call,@NotNull IOException e) {
                 e.printStackTrace();
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(@NotNull Call call,@NotNull Response response) throws IOException {
                 if (response.isSuccessful()) {
-                    final String myResponse = response.body().string();
-                    DownloadActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                JSONObject res = new JSONObject(myResponse);
-                                //String finalDownloadUrl = res.getString("link");
-                                finalDownloadUrl = res.getString("link");
-                                Log.i("finalUrl", finalDownloadUrl);
-                                DownloadFile myTask = new DownloadFile();
-                                myTask.execute(finalDownloadUrl);
-                                Button cancelButton = findViewById(R.id.cancelButton);
-                                cancelButton.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        myTask.cancel(true);
-                                    }
-                                });
-                            } catch (Exception e) {
-                                Log.i("exception", "1", e);
-                            }
+                    final String myResponse = Objects.requireNonNull(response.body()).string();
+                    DownloadActivity.this.runOnUiThread(() -> {
+                        try {
+                            JSONObject res = new JSONObject(myResponse);
+                            finalDownloadUrl = res.getString("link");
+                            Log.i("finalUrl", finalDownloadUrl);
+                            DownloadFile myTask = new DownloadFile();
+                            myTask.execute(finalDownloadUrl);
+                            Button cancelButton = findViewById(R.id.cancelButton);
+                            cancelButton.setOnClickListener(v1 -> myTask.cancel(true));
+                        } catch (Exception e) {
+                            Log.i("exception", "1", e);
                         }
                     });
                 }
@@ -409,71 +352,55 @@ public class DownloadActivity extends AppCompatActivity {
 
     public void share() {
         TextView share = findViewById(R.id.share);
-        share.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Snackbar snackBar = Snackbar .make(v, "Please wait", Snackbar.LENGTH_SHORT);
-                snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
-                snackBar.setTextColor(Color.WHITE);
-                snackBar.show();
-                // Toast toast=Toast.makeText(getApplicationContext(),"Please wait",Toast.LENGTH_SHORT);
-                // toast.show();
-                int cacheSize = 10 * 1024 * 1024;
-                File httpCacheDirectory = new File(getApplicationContext().getCacheDir(), "http-cache");
-                Cache cache = new Cache(httpCacheDirectory, cacheSize);
-                String url = "https://bookdl-api.herokuapp.com/download?url=" + download_url;
-                OkHttpClient client = new OkHttpClient.Builder()
-                        .addNetworkInterceptor(new CacheInterceptor())
-                        .cache(cache)
-                        .build();
-                Request request = new Request.Builder()
-                        .url(url)
-                        .build();
-                client.newCall(request).enqueue(new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        e.printStackTrace();
-                    }
+        share.setOnClickListener(v -> {
+            Snackbar snackBar = Snackbar .make(v, "Please wait", Snackbar.LENGTH_SHORT);
+            snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
+            snackBar.setTextColor(Color.WHITE);
+            snackBar.show();
+            String url = "https://bookdl-api.herokuapp.com/download?url=" + download_url;
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call,@NotNull IOException e) {
+                    e.printStackTrace();
+                }
 
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        if (response.isSuccessful()) {
-                            final String myResponse = response.body().string();
-                            DownloadActivity.this.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        JSONObject res = new JSONObject(myResponse);
-                                        //String finalDownloadUrl = res.getString("link");
-                                        finalDownloadUrl = res.getString("link");
-                                        Log.i("finalUrl", finalDownloadUrl);
-                                        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-                                        sharingIntent.setType("text/plain");
-                                        String shareBody = "Hi there! I would like to share this book with you.\n\n";
-                                        shareBody += finalDownloadUrl.trim();
-                                        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Bibliophile");
-                                        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
-                                        startActivity(Intent.createChooser(sharingIntent, "Share via"));
-                                    } catch (Exception e) {
-                                        Log.i("exception", "1", e);
-                                    }
-                                }
-                            });
-                        }
+                @Override
+                public void onResponse(@NotNull Call call,@NotNull Response response) throws IOException {
+                    if (response.isSuccessful()) {
+                        final String myResponse = Objects.requireNonNull(response.body()).string();
+                        DownloadActivity.this.runOnUiThread(() -> {
+                            try {
+                                JSONObject res = new JSONObject(myResponse);
+                                finalDownloadUrl = res.getString("link");
+                                Log.i("finalUrl", finalDownloadUrl);
+                                Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+                                sharingIntent.setType("text/plain");
+                                String shareBody = "Hi there! I would like to share this book with you.\n\n";
+                                shareBody += finalDownloadUrl.trim();
+                                sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Bibliophile");
+                                sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+                                startActivity(Intent.createChooser(sharingIntent, "Share via"));
+                            } catch (Exception e) {
+                                Log.i("exception", "1", e);
+                            }
+                        });
                     }
-                });
-            }
+                }
+            });
         });
     }
 
+    @SuppressLint("StaticFieldLeak")
     public class DownloadFile extends AsyncTask<String, Integer, String> {
         private String dirPath;
-        private View rootView = getWindow().getDecorView().getRootView();
+        private final View rootView = getWindow().getDecorView().getRootView();
+
         @Override
         protected void onPreExecute(){
             super.onPreExecute();
-            // Toast toast=Toast.makeText(getApplicationContext(),"Downloading",Toast.LENGTH_SHORT);
-            // toast.show();
             Snackbar snackBar = Snackbar .make(rootView, "Downloading", Snackbar.LENGTH_SHORT);
             snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
             snackBar.setTextColor(Color.WHITE);
@@ -493,24 +420,27 @@ public class DownloadActivity extends AppCompatActivity {
                 OkHttpClient client = new OkHttpClient();
                 Request request = new Request.Builder()
                         .url(Url[0])
-                        .header("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36")
+                        .header("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) " +
+                                "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36")
                         .build();
                 Response response = client.newCall(request).execute();
                 if (!response.isSuccessful()) {
                     throw new IOException("Failed to download file: " + response);
                 }
-                InputStream inputStream = response.body().byteStream();
+                InputStream inputStream = Objects.requireNonNull(response.body()).byteStream();
                 byte[] buff = new byte[1024 * 4];
                 int downloaded = 0;
-                int length = (int) response.body().contentLength();
+                int length = (int) Objects.requireNonNull(response.body()).contentLength();
                 String extension = response.headers().get("Content-type");
+                assert extension != null;
                 extension = extension.substring(extension.indexOf("/") + 1);
                 Log.i("extension", extension);
                 String fileName = title + "." + extension;
                 dirPath = Environment.getExternalStorageDirectory() + File.separator + "Books";
                 File file = new File(dirPath);
                 if (!file.exists()) {
-                    file.mkdirs();
+                    boolean result = file.mkdirs();
+                    Log.i("File", String.valueOf(result));
                 }
                 String path = file.getAbsolutePath();
                 File mediaFile = new File(path, fileName);
@@ -543,7 +473,6 @@ public class DownloadActivity extends AppCompatActivity {
         protected void onPostExecute(String Url) {
             super.onPostExecute(Url);
             ProgressBar progress = findViewById(R.id.progressBar);
-            Button downloadButton = findViewById(R.id.downloadButton);
             Button cancelButton = findViewById(R.id.cancelButton);
             TextView downloadPercent = findViewById(R.id.percent);
             downloadPercent.setText("0");
@@ -552,8 +481,6 @@ public class DownloadActivity extends AppCompatActivity {
             downloadPercent.setVisibility(View.INVISIBLE);
             checkIfFileExists();
             progress.setProgress(0);
-            // Toast toast=Toast.makeText(getApplicationContext(),"Download complete. Book saved in:" + dirPath,Toast.LENGTH_LONG);
-            // toast.show();
             Snackbar snackBar = Snackbar .make(rootView, "Download complete. Book saved in:" + dirPath, Snackbar.LENGTH_SHORT);
             snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
             snackBar.setTextColor(Color.WHITE);
@@ -563,8 +490,6 @@ public class DownloadActivity extends AppCompatActivity {
         @Override
         protected void onCancelled() {
             super.onCancelled();
-            // Toast toast=Toast.makeText(getApplicationContext(),"Cancelled ",Toast.LENGTH_SHORT);
-            // toast.show();
             Snackbar snackBar = Snackbar .make(rootView, "Cancelled", Snackbar.LENGTH_SHORT);
             snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
             snackBar.setTextColor(Color.WHITE);
@@ -587,7 +512,8 @@ public class DownloadActivity extends AppCompatActivity {
             ProgressBar progress = findViewById(R.id.progressBar);
             TextView downloadPercent = findViewById(R.id.percent);
             progress.setProgress(percent[0]);
-            downloadPercent.setText(percent[0] + "%");
+            String value = percent[0] + "%";
+            downloadPercent.setText(value);
         }
     }
 }

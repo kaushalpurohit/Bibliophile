@@ -20,7 +20,8 @@
                     android:id="@+id/categoryTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
                     android:textSize="@dimen/_15sdp"/>
             </RelativeLayout>
             <SearchView
