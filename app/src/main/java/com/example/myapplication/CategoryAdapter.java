@@ -1,21 +1,15 @@
 package com.example.myapplication;
 
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteStatement;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.view.LayoutInflater;
 
-import com.squareup.picasso.Picasso;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 // The adapter class which
@@ -23,12 +17,12 @@ import java.util.List;
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.MyButtonView> {
 
     // List with String type
-    private List<String> detailsList  = new ArrayList<>();
-    private Context mContext;
+    private final List<String> detailsList;
+    private final Context mContext;
 
     // View Holder class which
     // extends RecyclerView.ViewHolder
-    public class MyButtonView
+    public static class MyButtonView
             extends RecyclerView.ViewHolder {
 
         // Text View
@@ -55,6 +49,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.MyButt
     // Override onCreateViewHolder which deals
     // with the inflation of the card layout
     // as an item for the RecyclerView.
+    @NotNull
     @Override
     public MyButtonView onCreateViewHolder(ViewGroup parent,
                                          int viewType)
@@ -84,13 +79,10 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.MyButt
         // Set the text of each item of
         // Recycler view with the list items
         holder.cat.setText(detailsList.get(position));
-        holder.cat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent category = new Intent(mContext, Category.class);
-                category.putExtra("title", detailsList.get(position));
-                mContext.startActivity(category);
-            }
+        holder.cat.setOnClickListener(v -> {
+            Intent category = new Intent(mContext, Category.class);
+            category.putExtra("title", detailsList.get(position));
+            mContext.startActivity(category);
         });
     }
 

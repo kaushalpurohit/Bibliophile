@@ -1,9 +1,7 @@
 package com.example.myapplication;
 
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.pdf.PdfRenderer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,13 +10,10 @@ import android.os.ParcelFileDescriptor;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.SearchView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.shockwave.pdfium.PdfDocument;
@@ -28,16 +23,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import java.util.Objects;
 
 public class MyBooks extends AppCompatActivity {
-    public ArrayList<String> paths = new ArrayList<String>();
-    public ArrayList<String> fileName = new ArrayList<String>();
-    public ArrayList<String> fileList = new ArrayList<String>();
+    public ArrayList<String> paths = new ArrayList<>();
+    public ArrayList<String> fileName = new ArrayList<>();
+    public ArrayList<String> fileList = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
@@ -46,7 +37,7 @@ public class MyBooks extends AppCompatActivity {
         setContentView(R.layout.activity_my_books);
         Toolbar toolbar = findViewById(R.id.searchToolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         AsyncTaskRunner runner = new AsyncTaskRunner();
         runner.execute();
@@ -74,10 +65,9 @@ public class MyBooks extends AppCompatActivity {
             catch (IndexOutOfBoundsException e) {
                 Log.i("IO", "Search recycler index error");
             }
-            int spanCount = 2; // 2 columns
-            int spacing = getResources().getDimensionPixelSize(R.dimen._35sdp); // 100px
-            boolean includeEdge = true;
-            recyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge));
+            int spanCount = 2;
+            int spacing = getResources().getDimensionPixelSize(R.dimen._35sdp);
+            recyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, true));
             recyclerView.setAdapter(adapter);
         }
     }
@@ -91,34 +81,30 @@ public class MyBooks extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public boolean search() {
+    public void search() {
         SearchView text = findViewById(R.id.searchBook);
         text.setIconifiedByDefault(true);
         text.setQueryHint("search");
-        text.setOnSearchClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View V) {
-                text.setIconified(true);
-                Intent search = new Intent(MyBooks.this, Search.class);
-                search.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(search);
-            }
+        text.setOnSearchClickListener(V -> {
+            text.setIconified(true);
+            Intent search = new Intent(MyBooks.this, Search.class);
+            search.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(search);
         });
-        return true;
     }
 
     public void listFiles() {
         File file = new File(Environment.getExternalStorageDirectory() + File.separator + "Books");
         String pdfPattern = ".pdf";
-        File FileList[] = file.listFiles();
+        File[] FileList = file.listFiles();
         if (FileList != null) {
-            for (int i = 0; i < FileList.length; i++) {
+            for (File value : FileList) {
 
-                    if (FileList[i].getName().endsWith(pdfPattern)){
-                        fileName.add(FileList[i].getName());
-                        fileList.add(FileList[i].getAbsolutePath());
-                    }
+                if (value.getName().endsWith(pdfPattern)) {
+                    fileName.add(value.getName());
+                    fileList.add(value.getAbsolutePath());
                 }
+            }
             }
         createImage(fileList, fileName);
     }
@@ -161,8 +147,10 @@ public class MyBooks extends AppCompatActivity {
         FileOutputStream out = null;
         try {
             File folder = new File(FOLDER);
-            if(!folder.exists())
-                folder.mkdirs();
+            if (!folder.exists()) {
+                boolean result = folder.mkdirs();
+                Log.i("File", String.valueOf(result));
+            }
             String path = folder + File.separator + name.substring(0,name.indexOf('.')) + ".png";
             paths.add(Uri.fromFile(new File(path)).toString());
             File file = new File(path);

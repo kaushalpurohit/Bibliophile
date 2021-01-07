@@ -1,23 +1,19 @@
 package com.example.myapplication;
 
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteStatement;
-import android.net.LinkAddress;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.view.LayoutInflater;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
 // The adapter class which
@@ -26,22 +22,18 @@ public class Adapter
         extends RecyclerView.Adapter<Adapter.MyView> {
 
     // List with String type
-    private List<String> titleList  = new ArrayList<>();
-    private List<String> imageList = new ArrayList<>();
-    private List<String> pageList = new ArrayList<>();
-    private List<String> sizeList = new ArrayList<>();
-    private List<String> linkList = new ArrayList<>();
-    private Context mContext;
+    private final List<String> titleList;
+    private final List<String> imageList;
+    private final List<String> linkList;
+    private final Context mContext;
 
     // View Holder class which
     // extends RecyclerView.ViewHolder
-    public class MyView
+    public static class MyView
             extends RecyclerView.ViewHolder {
 
         // Text View
         TextView textView;
-        TextView pageText;
-        TextView sizeText;
         ImageView imageView;
         LinearLayout mainLayout;
 
@@ -50,25 +42,18 @@ public class Adapter
         public MyView(View view)
         {
             super(view);
-
-            // initialise TextView with id
-            textView = (TextView)view
-                    .findViewById(R.id.grid_text);
-            // pageText =  (TextView)view.findViewById(R.id.page_text);
-            // sizeText =  (TextView)view.findViewById(R.id.size_text);
-            imageView = (ImageView) view.findViewById((R.id.grid_image));
-            mainLayout = (LinearLayout) view.findViewById(R.id.mainLayout);
+            textView = view.findViewById(R.id.grid_text);
+            imageView = view.findViewById((R.id.grid_image));
+            mainLayout = view.findViewById(R.id.mainLayout);
         }
     }
 
     // Constructor for adapter class
     // which takes a list of String type
-    public Adapter(Context context, List<String> image, List<String> title, List<String> page, List<String> size, List<String> link)
+    public Adapter(Context context, List<String> image, List<String> title, List<String> link)
     {
         this.imageList = image;
         this.titleList = title;
-        this.pageList = page;
-        this.sizeList = size;
         this.linkList = link;
         this.mContext = context;
     }
@@ -76,6 +61,7 @@ public class Adapter
     // Override onCreateViewHolder which deals
     // with the inflation of the card layout
     // as an item for the RecyclerView.
+    @NotNull
     @Override
     public MyView onCreateViewHolder(ViewGroup parent,
                                      int viewType)
@@ -112,14 +98,11 @@ public class Adapter
                     .load(imageList.get(position))
                     .fit() // will explain later
                     .into(holder.imageView);
-            holder.mainLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent download = new Intent(mContext, DownloadActivity.class);
-                    download.putExtra("url", linkList.get(position));
-                    download.putExtra("title", titleList.get(position));
-                    mContext.startActivity(download);
-                }
+            holder.mainLayout.setOnClickListener(view -> {
+                Intent download = new Intent(mContext, DownloadActivity.class);
+                download.putExtra("url", linkList.get(position));
+                download.putExtra("title", titleList.get(position));
+                mContext.startActivity(download);
             });
     }
 

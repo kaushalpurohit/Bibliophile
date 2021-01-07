@@ -1,6 +1,5 @@
 package com.example.myapplication;
 
-import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -67,8 +66,6 @@ public class DownloadActivity extends AppCompatActivity {
     private final List<String> titleList = new ArrayList<>();
     private final List<String> linkList = new ArrayList<>();
     private final List<String> imageList = new ArrayList<>();
-    private final List<String> sizeList = new ArrayList<>();
-    private final List<String> pageList = new ArrayList<>();
     private ShimmerFrameLayout container;
 
     @Override
@@ -142,10 +139,7 @@ public class DownloadActivity extends AppCompatActivity {
     public void preview() {
         ImageView image = findViewById(R.id.download_image);
         image.setOnClickListener(v -> {
-            Snackbar snackBar = Snackbar .make(v, "Please wait", Snackbar.LENGTH_SHORT);
-            snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
-            snackBar.setTextColor(Color.WHITE);
-            snackBar.show();
+            showSnackBar(v, "Please wait");
             String url = "https://bookdl-api.herokuapp.com/download?url=" + download_url;
             Request request = new Request.Builder()
                     .url(url)
@@ -208,10 +202,7 @@ public class DownloadActivity extends AppCompatActivity {
                 try {
                     startActivity(intent);
                 } catch (ActivityNotFoundException e) {
-                    Snackbar snackBar = Snackbar .make(v, "Install a PDF reader!", Snackbar.LENGTH_SHORT);
-                    snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
-                    snackBar.setTextColor(Color.WHITE);
-                    snackBar.show();
+                    showSnackBar(v, "Install a pdf reader!");
                 }
             });
         }
@@ -243,65 +234,14 @@ public class DownloadActivity extends AppCompatActivity {
                             Picasso
                                     .with(DownloadActivity.this)
                                     .load(image)
-                                    .fit() // will explain later
+                                    .fit()
                                     .into(imageView);
                             download_url  = res.getString("download_url");
                             JSONArray info= res.getJSONArray("info");
                             JSONArray tags = res.getJSONArray("tags");
-                            for (int i = 0; i<4; i++) {
-                                infoList.add(info.getString(i));
-                            }
-                            for(int i = 0; i<4; i++){
-                                try{
-                                    tagList.add(tags.getString(i));
-                                }
-                                catch (Exception e){
-                                    Log.i("Exception", "Length");
-                                }
-                            }
                             JSONObject similarBooks = res.getJSONObject("similar_books");
-                            for (int i = 0; i < 7; i++ ) {
-                                try {
-                                    JSONObject index = similarBooks.getJSONObject(String.valueOf(i));
-                                    titleList.add(index.getString("title"));
-                                    linkList.add(index.getString("url"));
-                                    imageList.add(index.getString("image"));
-                                    sizeList.add(index.getString("size"));
-                                    pageList.add(index.getString("pages"));
-                                }
-                                catch (Exception e) {
-                                    Log.i("Exception", e.toString());
-                                }
-                            }
-                            Adapter adapter = new Adapter(DownloadActivity.this, imageList, titleList, pageList, sizeList, linkList);
-                            RecyclerView recyclerView = findViewById(R.id.similar_books);
-                            try {
-                                recyclerView.removeItemDecorationAt(0);
-                            }
-                            catch (IndexOutOfBoundsException e) {
-                                Log.i("IO", "Search recycler index error");
-                            }
-                            int spanCount = 2;
-                            int spacing = getResources().getDimensionPixelSize(R.dimen._35sdp);
-                            recyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, true));
-                            recyclerView.setNestedScrollingEnabled(false);
-                            //LinearLayoutManager VerticalLayout = new LinearLayoutManager(DownloadActivity.this, LinearLayoutManager.VERTICAL, false);
-                            LinearLayoutManager HorizontalLayout = new LinearLayoutManager(DownloadActivity.this, LinearLayoutManager.HORIZONTAL, false);
-                            //recyclerView.setLayoutManager(VerticalLayout);
-                            textAdapter infoAdapter = new textAdapter(DownloadActivity.this, infoList);
-                            CategoryAdapter tagAdapter = new CategoryAdapter(DownloadActivity.this, tagList);
-                            RecyclerView infoRecyclerView = findViewById(R.id.info);
-                            RecyclerView tagRecyclerView = findViewById(R.id.tag);
-                            LinearLayoutManager NewVerticalLayout = new LinearLayoutManager(DownloadActivity.this, LinearLayoutManager.VERTICAL, false);
-                            infoRecyclerView.setLayoutManager(NewVerticalLayout);
-                            tagRecyclerView.setLayoutManager(HorizontalLayout);
-                            infoRecyclerView.setAdapter(infoAdapter);
-                            recyclerView.setAdapter(adapter);
-                            tagRecyclerView.setAdapter(tagAdapter);
-                            container.stopShimmer();
-                            container.setVisibility(View.GONE);
-                            androidx.core.widget.NestedScrollView homeLayout = findViewById(R.id.download_scroll);
-                            homeLayout.setVisibility(View.VISIBLE);
+                            initializeLists(info, tags, similarBooks);
+                            initializeRecyclerView();
                             firstRun();
                         }
                         catch (Exception e){
@@ -313,11 +253,67 @@ public class DownloadActivity extends AppCompatActivity {
         });
     }
 
+    public void initializeLists(JSONArray info, JSONArray tags, JSONObject similarBooks) {
+        for (int i = 0; i<4; i++) {
+            try {
+                infoList.add(info.getString(i));
+            }
+            catch (Exception e) {
+                Log.i("Exception", "Length");
+            }
+        }
+        for(int i = 0; i<4; i++){
+            try{
+                tagList.add(tags.getString(i));
+            }
+            catch (Exception e){
+                Log.i("Exception", "Length");
+            }
+        }
+        for (int i = 0; i < 7; i++ ) {
+            try {
+                JSONObject index = similarBooks.getJSONObject(String.valueOf(i));
+                titleList.add(index.getString("title"));
+                linkList.add(index.getString("url"));
+                imageList.add(index.getString("image"));
+            }
+            catch (Exception e) {
+                Log.i("Exception", e.toString());
+            }
+        }
+    }
+
+    public void initializeRecyclerView(){
+        Adapter adapter = new Adapter(DownloadActivity.this, imageList, titleList, linkList);
+        RecyclerView recyclerView = findViewById(R.id.similar_books);
+        try {
+            recyclerView.removeItemDecorationAt(0);
+        }
+        catch (IndexOutOfBoundsException e) {
+            Log.i("IO", "Search recycler index error");
+        }
+        int spanCount = 2;
+        int spacing = getResources().getDimensionPixelSize(R.dimen._35sdp);
+        recyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, true));
+        recyclerView.setNestedScrollingEnabled(false);
+        LinearLayoutManager HorizontalLayout = new LinearLayoutManager(DownloadActivity.this, LinearLayoutManager.HORIZONTAL, false);
+        textAdapter infoAdapter = new textAdapter(infoList);
+        CategoryAdapter tagAdapter = new CategoryAdapter(DownloadActivity.this, tagList);
+        RecyclerView infoRecyclerView = findViewById(R.id.info);
+        RecyclerView tagRecyclerView = findViewById(R.id.tag);
+        LinearLayoutManager NewVerticalLayout = new LinearLayoutManager(DownloadActivity.this, LinearLayoutManager.VERTICAL, false);
+        infoRecyclerView.setLayoutManager(NewVerticalLayout);
+        tagRecyclerView.setLayoutManager(HorizontalLayout);
+        infoRecyclerView.setAdapter(infoAdapter);
+        recyclerView.setAdapter(adapter);
+        tagRecyclerView.setAdapter(tagAdapter);
+        container.stopShimmer();
+        container.setVisibility(View.GONE);
+        androidx.core.widget.NestedScrollView homeLayout = findViewById(R.id.download_scroll);
+        homeLayout.setVisibility(View.VISIBLE);
+    }
     public void download(View v) {
-        Snackbar snackBar = Snackbar .make(v, "Please wait", Snackbar.LENGTH_SHORT);
-        snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
-        snackBar.setTextColor(Color.WHITE);
-        snackBar.show();
+        showSnackBar(v, "Please wait");
         String url = "https://bookdl-api.herokuapp.com/download?url=" + download_url;
         Request request = new Request.Builder()
                 .url(url)
@@ -353,10 +349,7 @@ public class DownloadActivity extends AppCompatActivity {
     public void share() {
         TextView share = findViewById(R.id.share);
         share.setOnClickListener(v -> {
-            Snackbar snackBar = Snackbar .make(v, "Please wait", Snackbar.LENGTH_SHORT);
-            snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
-            snackBar.setTextColor(Color.WHITE);
-            snackBar.show();
+            showSnackBar(v, "Please wait");
             String url = "https://bookdl-api.herokuapp.com/download?url=" + download_url;
             Request request = new Request.Builder()
                     .url(url)
@@ -393,7 +386,13 @@ public class DownloadActivity extends AppCompatActivity {
         });
     }
 
-    @SuppressLint("StaticFieldLeak")
+    public void showSnackBar(View rootView, String text) {
+        Snackbar snackBar = Snackbar .make(rootView, text, Snackbar.LENGTH_SHORT);
+        snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
+        snackBar.setTextColor(Color.WHITE);
+        snackBar.show();
+    }
+
     public class DownloadFile extends AsyncTask<String, Integer, String> {
         private String dirPath;
         private final View rootView = getWindow().getDecorView().getRootView();
@@ -401,10 +400,7 @@ public class DownloadActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute(){
             super.onPreExecute();
-            Snackbar snackBar = Snackbar .make(rootView, "Downloading", Snackbar.LENGTH_SHORT);
-            snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
-            snackBar.setTextColor(Color.WHITE);
-            snackBar.show();
+            showSnackBar(rootView, "Downloading");
             ProgressBar progress = findViewById(R.id.progressBar);
             Button downloadButton = findViewById(R.id.downloadButton);
             Button cancelButton = findViewById(R.id.cancelButton);
@@ -451,8 +447,7 @@ public class DownloadActivity extends AppCompatActivity {
                     if (read == -1) {
                         break;
                     }
-                    output.write(buff, 0, read);
-                    //write buff
+                    output.write(buff, 0, read); // write buff
                     downloaded += read;
                     publishProgress(percent);
                     if(isCancelled()) {
@@ -481,19 +476,14 @@ public class DownloadActivity extends AppCompatActivity {
             downloadPercent.setVisibility(View.INVISIBLE);
             checkIfFileExists();
             progress.setProgress(0);
-            Snackbar snackBar = Snackbar .make(rootView, "Download complete. Book saved in:" + dirPath, Snackbar.LENGTH_SHORT);
-            snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
-            snackBar.setTextColor(Color.WHITE);
-            snackBar.show();
+            String text = "Download complete. Book saved in:" + dirPath;
+            showSnackBar(rootView, text);
         }
 
         @Override
         protected void onCancelled() {
             super.onCancelled();
-            Snackbar snackBar = Snackbar .make(rootView, "Cancelled", Snackbar.LENGTH_SHORT);
-            snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
-            snackBar.setTextColor(Color.WHITE);
-            snackBar.show();
+            showSnackBar(rootView, "Cancelled");
             ProgressBar progress = findViewById(R.id.progressBar);
             Button downloadButton = findViewById(R.id.downloadButton);
             Button cancelButton = findViewById(R.id.cancelButton);

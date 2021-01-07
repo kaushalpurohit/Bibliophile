@@ -2,18 +2,13 @@ package com.example.myapplication;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Context;
-import android.database.sqlite.SQLiteStatement;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.view.LayoutInflater;
 
-import com.squareup.picasso.Picasso;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 // The adapter class which
@@ -22,12 +17,11 @@ public class textAdapter
         extends RecyclerView.Adapter<textAdapter.MyTextView> {
 
     // List with String type
-    private List<String> detailsList  = new ArrayList<>();
-    private Context mContext;
+    private final List<String> detailsList;
 
     // View Holder class which
     // extends RecyclerView.ViewHolder
-    public class MyTextView
+    public static class MyTextView
             extends RecyclerView.ViewHolder {
 
         // Text View
@@ -39,22 +33,21 @@ public class textAdapter
             super(view);
 
             // initialise TextView with id
-            textView = (TextView) view
-                    .findViewById(R.id.details);
+            textView = view.findViewById(R.id.details);
         }
     }
 
     // Constructor for adapter class
     // which takes a list of String type
-    public textAdapter(Context context, List<String> details)
+    public textAdapter(List<String> details)
     {
         this.detailsList = details;
-        this.mContext = context;
     }
 
     // Override onCreateViewHolder which deals
     // with the inflation of the card layout
     // as an item for the RecyclerView.
+    @NotNull
     @Override
     public MyTextView onCreateViewHolder(ViewGroup parent,
                                      int viewType)

@@ -15,12 +15,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.facebook.shimmer.ShimmerFrameLayout;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import okhttp3.Cache;
 import okhttp3.Call;
@@ -34,8 +36,6 @@ public class Category extends AppCompatActivity {
     private List<String> titleList = new ArrayList<>();
     private List<String> linkList = new ArrayList<>();
     private List<String> imageList = new ArrayList<>();
-    private List<String> sizeList = new ArrayList<>();
-    private List<String> pageList = new ArrayList<>();
     private ShimmerFrameLayout container;
 
     @Override
@@ -46,7 +46,7 @@ public class Category extends AppCompatActivity {
         title = intent.getStringExtra("title");
         Toolbar toolbar = findViewById(R.id.searchToolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         TextView categoryTitle = findViewById(R.id.categoryTitle);
@@ -55,20 +55,16 @@ public class Category extends AppCompatActivity {
         showBooks();
     }
 
-    public boolean search() {
+    public void search() {
         SearchView text = findViewById(R.id.searchBook);
         text.setIconifiedByDefault(true);
         text.setQueryHint("search");
-        text.setOnSearchClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View V) {
-                text.setIconified(true);
-                Intent search = new Intent(Category.this, Search.class);
-                search.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(search);
-            }
+        text.setOnSearchClickListener(V -> {
+            text.setIconified(true);
+            Intent search = new Intent(Category.this, Search.class);
+            search.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(search);
         });
-        return true;
     }
 
     @Override
@@ -82,10 +78,10 @@ public class Category extends AppCompatActivity {
     }
 
     public void showBooks(){
-        container = (ShimmerFrameLayout) findViewById(R.id.shimmer_view_container_search);
+        container = findViewById(R.id.shimmer_view_container_search);
         container.setVisibility(View.VISIBLE);
         container.startShimmer();
-        RecyclerView searchRecycler = (RecyclerView) findViewById(R.id.searchRecycler);
+        RecyclerView searchRecycler = findViewById(R.id.searchRecycler);
         searchRecycler.setAdapter(null);
         int cacheSize = 10 * 1024 * 1024;
         File httpCacheDirectory = new File(getApplicationContext().getCacheDir(), "http-cache");
@@ -100,61 +96,54 @@ public class Category extends AppCompatActivity {
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NotNull Call call,@NotNull IOException e) {
                 e.printStackTrace();
             }
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if (response.isSuccessful()) {
-                    final String myResponse = response.body().string();
-                    Category.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                for(int i=1; i<11; i++) {
-                                    JSONObject res = (new JSONObject(myResponse)).getJSONObject(String.valueOf(i));
-                                    String title = res.getString("Title");
-                                    String link = res.getString("Link");
-                                    String image = res.getString("image");
-                                    String size = res.getString("size");
-                                    String page = res.getString("page");
-                                    titleList.add(title);
-                                    linkList.add(link);
-                                    imageList.add(image);
-                                    sizeList.add(size);
-                                    pageList.add(page);
-                                }
-                                container.stopShimmer();
-                                container.setVisibility(View.GONE);
-                                Adapter adapter = new Adapter(Category.this, imageList, titleList, pageList, sizeList, linkList);
-                                RecyclerView recyclerView = (RecyclerView)findViewById(R.id.searchRecycler);
-                                try {
-                                    recyclerView.removeItemDecorationAt(0);
-                                }
-                                catch (IndexOutOfBoundsException e) {
-                                    Log.i("IO", "Search recycler index error");
-                                }
-                                RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(Category.this, 2);
-                                recyclerView.setLayoutManager(mLayoutManager);
-                                int spanCount = 2; // 2 columns
-                                int spacing = getResources().getDimensionPixelSize(R.dimen._35sdp); // 100px
-                                boolean includeEdge = true;
-                                recyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge));
-                                recyclerView.setAdapter(adapter);
-                                titleList = new ArrayList<>();
-                                linkList = new ArrayList<>();
-                                imageList = new ArrayList<>();
-                                sizeList = new ArrayList<>();
-                                pageList = new ArrayList<>();
-                                recyclerView.setVisibility(View.VISIBLE);
+                    final String myResponse = Objects.requireNonNull(Objects.requireNonNull(response.body()).string());
+                    Category.this.runOnUiThread(() -> {
+                        try {
+                            for(int i=1; i<11; i++) {
+                                JSONObject res = (new JSONObject(myResponse)).getJSONObject(String.valueOf(i));
+                                String title = res.getString("Title");
+                                String link = res.getString("Link");
+                                String image = res.getString("image");
+                                titleList.add(title);
+                                linkList.add(link);
+                                imageList.add(image);
                             }
-                            catch (Exception e){
-                                Log.i("exception", "1", e);
-                            }
+                            container.stopShimmer();
+                            container.setVisibility(View.GONE);
+                            initializeRecyclerView();
+                        }
+                        catch (Exception e){
+                            Log.i("exception", "1", e);
                         }
                     });
                 }
             }
         });
+    }
+    public void initializeRecyclerView() {
+        Adapter adapter = new Adapter(Category.this, imageList, titleList, linkList);
+        RecyclerView recyclerView = findViewById(R.id.searchRecycler);
+        try {
+            recyclerView.removeItemDecorationAt(0);
+        }
+        catch (IndexOutOfBoundsException e) {
+            Log.i("IO", "Search recycler index error");
+        }
+        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(Category.this, 2);
+        recyclerView.setLayoutManager(mLayoutManager);
+        int spanCount = 2;
+        int spacing = getResources().getDimensionPixelSize(R.dimen._35sdp);
+        recyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, true));
+        recyclerView.setAdapter(adapter);
+        titleList = new ArrayList<>();
+        linkList = new ArrayList<>();
+        imageList = new ArrayList<>();
+        recyclerView.setVisibility(View.VISIBLE);
     }
 }
