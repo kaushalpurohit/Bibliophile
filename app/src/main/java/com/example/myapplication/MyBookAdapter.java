@@ -115,13 +115,12 @@ public class MyBookAdapter extends RecyclerView.Adapter<MyBookAdapter.MyCardView
             Log.i("IO", "Recycler imageView index error");
         }
         holder.mainLayout.setOnClickListener(view -> {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
+            Intent pdfRead = new Intent(mContext, PdfReader.class);
             File file = new File(fileList.get(position));
-            Uri uri = Uri.fromFile(file);
-            intent.setDataAndType(uri, "application/pdf");
-            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+            Log.i("path", file.toString());
+            pdfRead.putExtra("path", fileList.get(position));
             try {
-                mContext.startActivity(intent);
+                mContext.startActivity(pdfRead);
             } catch (ActivityNotFoundException e) {
                 Log.i("File", "No PDF reader installed!");
             }
