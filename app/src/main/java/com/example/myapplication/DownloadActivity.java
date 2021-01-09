@@ -195,12 +195,11 @@ public class DownloadActivity extends AppCompatActivity {
             downloadButton.setVisibility(View.INVISIBLE);
             readButton.setVisibility(View.VISIBLE);
             readButton.setOnClickListener(v -> {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                Uri uri = Uri.fromFile(file);
-                intent.setDataAndType(uri, "application/pdf");
-                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                Intent pdfRead = new Intent(this, PdfReader.class);
+                Log.i("path", file.toString());
+                pdfRead.putExtra("path", file.toString());
                 try {
-                    startActivity(intent);
+                    startActivity(pdfRead);
                 } catch (ActivityNotFoundException e) {
                     showSnackBar(v, "Install a pdf reader!");
                 }
