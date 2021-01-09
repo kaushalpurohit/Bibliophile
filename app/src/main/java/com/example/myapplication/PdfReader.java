@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +12,8 @@ import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.github.barteksc.pdfviewer.listener.OnPageErrorListener;
+import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
+import com.github.barteksc.pdfviewer.util.FitPolicy;
 import com.shockwave.pdfium.PdfDocument;
 
 import java.io.File;
@@ -20,7 +23,7 @@ public class PdfReader extends AppCompatActivity implements OnPageChangeListener
         OnPageErrorListener {
     PDFView pdfView;
     private static final String TAG = PdfReader.class.getSimpleName();
-    private Integer pageNumber;
+    private Integer pageNumber = 0;
     private String pdfFileName;
 
     @Override
@@ -30,10 +33,24 @@ public class PdfReader extends AppCompatActivity implements OnPageChangeListener
         Intent intent = getIntent();
         String bookPath = intent.getStringExtra("path");
         File path = new File(bookPath);
+        pdfView = (PDFView) findViewById(R.id.pdfView);
         readPdf(path);
     }
 
     private void readPdf(File path) {
+        boolean nightMode = false;
+        int nightModeFlags =
+                getApplicationContext().getResources().getConfiguration().uiMode &
+                        Configuration.UI_MODE_NIGHT_MASK;
+        switch (nightModeFlags) {
+            case Configuration.UI_MODE_NIGHT_YES:
+                nightMode = true;
+                break;
+
+            case Configuration.UI_MODE_NIGHT_NO:
+                nightMode = false;
+                break;
+        }
         pdfFileName = "Name";
         Log.i("path", path.toString());
         pdfView.fromFile(path)
@@ -43,6 +60,9 @@ public class PdfReader extends AppCompatActivity implements OnPageChangeListener
                 .onLoad(this)
                 .onPageChange(this)
                 .enableAnnotationRendering(true)
+                .scrollHandle(new DefaultScrollHandle(this))
+                .pageFling(true)
+                .nightMode(nightMode)
                 .load();
     }
 
