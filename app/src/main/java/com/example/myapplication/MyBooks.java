@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.os.StrictMode;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.SearchView;
@@ -16,6 +18,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
 
@@ -69,8 +73,34 @@ public class MyBooks extends AppCompatActivity {
             int spacing = getResources().getDimensionPixelSize(R.dimen._34sdp);
             recyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, true));
             recyclerView.setAdapter(adapter);
+            firstRun();
         }
     }
+
+    public void firstRun(){
+        SharedPreferences wmbPreference = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean isFirstRun = wmbPreference.getBoolean("PDFVIEWER", true);
+        if (isFirstRun)
+        {
+            // Code to run once
+            SharedPreferences.Editor editor = wmbPreference.edit();
+            editor.putBoolean("PDFVIEWER", false);
+            //editor.commit();
+            editor.apply();
+            showcase();
+        }
+    }
+
+    public void showcase(){
+        ViewTarget target = new ViewTarget(findViewById(R.id.Mybooks));
+        new ShowcaseView.Builder(this)
+                .setContentTitle("New feature!")
+                .setContentText("Tap on the book to start reading.")
+                .hideOnTouchOutside()
+                .build()
+                .show();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // handle arrow click here

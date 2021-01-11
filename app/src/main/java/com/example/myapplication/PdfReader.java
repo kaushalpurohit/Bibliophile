@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,8 +24,9 @@ public class PdfReader extends AppCompatActivity implements OnPageChangeListener
         OnPageErrorListener {
     PDFView pdfView;
     private static final String TAG = PdfReader.class.getSimpleName();
-    private Integer pageNumber = 0;
+    private Integer pageNumber;
     private String pdfFileName;
+    private String title;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,10 +34,30 @@ public class PdfReader extends AppCompatActivity implements OnPageChangeListener
         setContentView(R.layout.activity_pdf_reader);
         Intent intent = getIntent();
         String bookPath = intent.getStringExtra("path");
+        title = intent.getStringExtra("title");
+        SharedPreferences sh = getSharedPreferences("PdfReader", MODE_APPEND);
+        pageNumber = sh.getInt(title, 0);
         File path = new File(bookPath);
         pdfView = (PDFView) findViewById(R.id.pdfView);
         readPdf(path);
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SharedPreferences sh = getSharedPreferences("PdfReader", MODE_PRIVATE);
+        SharedPreferences.Editor myEdit = sh.edit();
+        myEdit.putInt(title, pageNumber);
+        myEdit.apply();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences sh = getSharedPreferences("PdfReader", MODE_APPEND);
+        pageNumber = sh.getInt(title, 0);
+    }
+
 
     private void readPdf(File path) {
         boolean nightMode = false;

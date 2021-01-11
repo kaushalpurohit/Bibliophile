@@ -5,9 +5,11 @@ import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -104,7 +106,8 @@ public class MyBookAdapter extends RecyclerView.Adapter<MyBookAdapter.MyCardView
 
         // Set the text of each item of
         // Recycler view with the list items
-        holder.title.setText(detailsList.get(position).substring(0, detailsList.get(position).indexOf('.')));
+        String title = detailsList.get(position).substring(0, detailsList.get(position).indexOf('.'));
+        holder.title.setText(title);
         try {
             Picasso
                     .with(mContext)
@@ -119,6 +122,7 @@ public class MyBookAdapter extends RecyclerView.Adapter<MyBookAdapter.MyCardView
             File file = new File(fileList.get(position));
             Log.i("path", file.toString());
             pdfRead.putExtra("path", fileList.get(position));
+            pdfRead.putExtra("title", title);
             try {
                 mContext.startActivity(pdfRead);
             } catch (ActivityNotFoundException e) {
