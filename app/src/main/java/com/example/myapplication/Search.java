@@ -32,6 +32,7 @@ import java.util.Objects;
 import okhttp3.Cache;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.OkHttp;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -121,6 +122,7 @@ public class Search extends AppCompatActivity {
                 container.startShimmer();
                 RecyclerView searchRecycler = findViewById(R.id.searchRecycler);
                 searchRecycler.setAdapter(null);
+                searchRecycler.setVisibility(View.VISIBLE);
                 int cacheSize = 10 * 1024 * 1024;
                 File httpCacheDirectory = new File(getApplicationContext().getCacheDir(), "http-cache");
                 Cache cache = new Cache(httpCacheDirectory, cacheSize);
@@ -161,6 +163,7 @@ public class Search extends AppCompatActivity {
                                 }
                             });
                         }
+
                     }
                 });
                 return false;
@@ -206,7 +209,6 @@ public class Search extends AppCompatActivity {
         titleList = new ArrayList<>();
         linkList = new ArrayList<>();
         imageList = new ArrayList<>();
-        recyclerView.setVisibility(View.VISIBLE);
     }
 
 }

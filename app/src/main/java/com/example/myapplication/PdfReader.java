@@ -3,10 +3,13 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.barteksc.pdfviewer.PDFView;
@@ -67,10 +70,12 @@ public class PdfReader extends AppCompatActivity implements OnPageChangeListener
         switch (nightModeFlags) {
             case Configuration.UI_MODE_NIGHT_YES:
                 nightMode = true;
+                getWindow().setStatusBarColor(Color.BLACK);
                 break;
 
             case Configuration.UI_MODE_NIGHT_NO:
                 nightMode = false;
+                getWindow().setStatusBarColor(Color.WHITE);
                 break;
         }
         pdfFileName = "Name";
