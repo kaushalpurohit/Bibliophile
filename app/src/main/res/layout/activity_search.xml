@@ -12,18 +12,34 @@
         android:layout_height = "?attr/actionBarSize"
         android:background = "#2F0743">
         <RelativeLayout
-            android:layout_width="@dimen/_220sdp"
+            android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <SearchView
                 android:id="@+id/searchBook"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
+                android:searchHintIcon="@null"
+                android:searchIcon="@null"
+                android:theme="@style/SearchView"
+                android:queryBackground="@null"
                 android:queryHint="@string/searchBooks"
                 android:iconifiedByDefault="false" />
         </RelativeLayout>
     </androidx.appcompat.widget.Toolbar>
+    <ListView
+        android:id="@+id/list_view"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="@dimen/_10sdp"
+        android:layout_marginRight="@dimen/_10sdp"
+        android:scrollbars="none"
+        android:layout_height="wrap_content"
+        android:foregroundGravity="top"
+        android:layout_marginTop="@dimen/_50sdp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:visibility="gone"/>
 
     <com.facebook.shimmer.ShimmerFrameLayout
         android:layout_marginTop="?attr/actionBarSize"

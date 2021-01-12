@@ -1,11 +1,14 @@
 package com.example.myapplication;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -19,7 +22,10 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,6 +40,9 @@ public class Search extends AppCompatActivity {
     private List<String> titleList = new ArrayList<>();
     private List<String> linkList = new ArrayList<>();
     private List<String> imageList = new ArrayList<>();
+    private final List<Suggestions> searchList = new ArrayList<>();
+    private ListView list;
+    private ListViewAdapter adapter;
     private ShimmerFrameLayout container;
 
     @Override
@@ -42,6 +51,10 @@ public class Search extends AppCompatActivity {
         setContentView(R.layout.activity_search);
         Toolbar toolbar = findViewById(R.id.searchToolbar);
         setSupportActionBar(toolbar);
+        list = (ListView) findViewById(R.id.list_view);
+        addSuggestions();
+        adapter = new ListViewAdapter(this, searchList);
+        list.setAdapter(adapter);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -55,6 +68,25 @@ public class Search extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void addSuggestions() {
+        String[] suggestions = new String[]{
+                "The Da Vinci code", "The alchemist", "Bloodline", "Memory man", "I Feel Bad About My Neck"
+                , "Broken Glass", "The Girl With the Dragon Tattoo", "Harry Potter",
+                "A Little Life", "Chronicles: Volume One", "The Tipping Point", "Darkmans", "The Siege",
+                "Light", "Visitation", "Bad Blood", "The Cost of Living", "Gone Girl", "Underland",
+                "Small Island", "Brooklyn", "Night Watch", "Moneyball", "Atonement", "The Year of Magical Thinking"
+                , "The Line of Beauty", "The Green Road", "Normal People", "Life After Life", "The Shock Doctrine"
+                , "The Road", "The Sixth Extinction", "My Brilliant Friend", "Never Let Me Go", "Wolf Hall",
+                "Origin", "Angels & Demons", "Inferno", "Digital Fortress", "Deception Point", "If Tomorrow Comes",
+                "Nothing Lasts Forever", "The Doomsday Conspiracy", "The Silent Widow"
+        };
+        Arrays.sort(suggestions);
+        for(String suggestion : suggestions) {
+            Suggestions suggestionText = new Suggestions(suggestion);
+            searchList.add(suggestionText);
+        }
     }
 
 
@@ -76,9 +108,14 @@ public class Search extends AppCompatActivity {
         text.setMaxWidth(Integer.MAX_VALUE);
         text.setIconified(false);
         text.setFocusable(true);
+        int hintId =  text.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
+        TextView textView = (TextView) text.findViewById(hintId);
+        textView.setTextColor(Color.WHITE);
+        textView.setHintTextColor(Color.GRAY);
         text.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String search) {
+                list.setVisibility(View.GONE);
                 container = findViewById(R.id.shimmer_view_container_search);
                 container.setVisibility(View.VISIBLE);
                 container.startShimmer();
@@ -131,14 +168,20 @@ public class Search extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                container = findViewById(R.id.shimmer_view_container_search);
+                container.stopShimmer();
+                container.setVisibility(View.GONE);
+                list.setVisibility(View.VISIBLE);
                 RecyclerView searchRecycler= findViewById(R.id.searchRecycler);
+                searchRecycler.setAdapter(null);
+                searchRecycler.setVisibility(View.GONE);
                 try {
                     searchRecycler.removeItemDecorationAt(0);
                 }
                 catch (IndexOutOfBoundsException e) {
                     Log.i("IO", "Search recycler index error");
                 }
-                searchRecycler.setAdapter(null);
+                adapter.filter(newText);
                 return false;
             }
         });

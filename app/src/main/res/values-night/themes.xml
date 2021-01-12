@@ -17,4 +17,5 @@
         <item name="actionMenuTextColor">@color/white</item>
         <item name="colorControlNormal">@color/white</item>
     </style>
+
 </resources>

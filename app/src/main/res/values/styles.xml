@@ -24,5 +24,8 @@
     <style name="ShowcaseView">
         <item name="sv_backgroundColor">@color/purple_500</item>
     </style>
+    <style name="SearchView" parent="Widget.AppCompat.SearchView">
+        <item name="colorControlActivated">#FFffffff</item>
+    </style>
 
 </resources>

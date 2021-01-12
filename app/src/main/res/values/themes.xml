@@ -17,4 +17,5 @@
         <item name="colorControlNormal">@color/white</item>
         <item name="android:windowBackground">@color/black</item>
     </style>
+
 </resources>

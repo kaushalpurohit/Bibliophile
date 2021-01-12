@@ -33,6 +33,8 @@
                 android:layout_marginLeft="@dimen/_5sdp"
                 android:layout_marginBottom="@dimen/_5sdp"
                 app:contentPadding="@dimen/_2sdp"
+                android:backgroundTint="@color/white"
+                android:background="@color/white"
                 android:outlineAmbientShadowColor="@color/purple"
                 android:elevation="@dimen/_10sdp"
                 app:cardCornerRadius="@dimen/_40sdp"
@@ -42,6 +44,7 @@
                     android:layout_height="@dimen/_5sdp"
                     android:layout_alignParentRight="true"
                     android:src="@drawable/delete"
+                    android:background="#ffffff"
                     android:layout_alignParentEnd="true" />
             </androidx.cardview.widget.CardView>
         </RelativeLayout>
