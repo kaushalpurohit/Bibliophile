@@ -83,9 +83,9 @@ public class DownloadActivity extends AppCompatActivity {
         cache = new Cache(httpCacheDirectory, cacheSize);
         client =  new OkHttpClient.Builder()
                 .addNetworkInterceptor(new CacheInterceptor())
-                .connectTimeout(15, TimeUnit.SECONDS)
-                .readTimeout(15, TimeUnit.SECONDS)
-                .writeTimeout(15, TimeUnit.SECONDS)
+                .connectTimeout(20, TimeUnit.SECONDS)
+                .readTimeout(20, TimeUnit.SECONDS)
+                .writeTimeout(20, TimeUnit.SECONDS)
                 .cache(cache)
                 .build();
         search();
