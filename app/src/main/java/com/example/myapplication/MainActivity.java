@@ -61,7 +61,9 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setTheme(R.style.Theme_MyApplication);
         setContentView(R.layout.activity_main);
+        createCategoryButtons();
         container = findViewById(R.id.shimmer_view_container);
+        container.setVisibility(View.VISIBLE);
         container.startShimmer();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -73,7 +75,6 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.bringToFront();
         navigationView.setNavigationItemSelectedListener(this);
-        createCategoryButtons();
         createCategories();
         int permission = ActivityCompat.checkSelfPermission(MainActivity.this, WRITE_EXTERNAL_STORAGE);
 
@@ -180,20 +181,22 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    public void initializeRecyclerView(JSONObject res, int[] val, int[] rec, int i) throws JSONException {
+    public void initializeRecyclerView(JSONObject res,
+                                       int[] val,
+                                       int[] rec,
+                                       int i) throws JSONException {
         Iterator<String> keys = res.keys();
         String property = keys.next();
         TextView title1 = findViewById(val[i]);
         title1.setText(property);
         JSONObject details = res.getJSONObject(property);
-        for (int j = 0; j < 4; j++ ) {
+        for (int j = 0; j < 4; j++) {
             try {
                 JSONObject index = details.getJSONObject(String.valueOf(j));
                 titleList.add(index.getString("title"));
                 linkList.add(index.getString("link"));
                 imageList.add(index.getString("image"));
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.i("Exception", "Length");
             }
         }
@@ -203,8 +206,7 @@ public class MainActivity extends AppCompatActivity
         recyclerView.setLayoutManager(HorizontalLayout);
         try {
             recyclerView.removeItemDecorationAt(0);
-        }
-        catch (IndexOutOfBoundsException e) {
+        } catch (IndexOutOfBoundsException e) {
             Log.i("IO", "Search recycler index error");
         }
         int spanCount = 4;
