@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android" android:opacity="opaque">
-
-    <!-- The white background color as one in Amazon, YouTube, or Drive app -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@color/splash"/>
-
-    <!-- App logo -->
-    <item>
+    <item
+        android:bottom="@dimen/_40sdp">
         <bitmap
             android:gravity="center"
-            android:src="@drawable/ic_baseline_book"/>
+            android:src="@drawable/ic_logo" />
     </item>
 </layer-list>
