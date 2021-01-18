@@ -4,32 +4,50 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -38,6 +56,7 @@ import java.util.Objects;
 import okhttp3.Cache;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -52,6 +71,7 @@ public class MainActivity extends AppCompatActivity
     private  List<String> titleList = new ArrayList<>();
     private  List<String> linkList = new ArrayList<>();
     private  List<String> imageList = new ArrayList<>();
+    public View root;
     private ShimmerFrameLayout container;
     private  final List<String> category = new ArrayList<>();
 
@@ -61,10 +81,14 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setTheme(R.style.Theme_MyApplication);
         setContentView(R.layout.activity_main);
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
         createCategoryButtons();
+        root = getWindow().getDecorView().findViewById(R.id.main);
         container = findViewById(R.id.shimmer_view_container);
-        container.setVisibility(View.VISIBLE);
+        // container.setVisibility(View.VISIBLE);
         container.startShimmer();
+        createCategories();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -75,7 +99,6 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.bringToFront();
         navigationView.setNavigationItemSelectedListener(this);
-        createCategories();
         int permission = ActivityCompat.checkSelfPermission(MainActivity.this, WRITE_EXTERNAL_STORAGE);
 
         if (permission == PackageManager.PERMISSION_DENIED) {
@@ -124,6 +147,18 @@ public class MainActivity extends AppCompatActivity
                 Intent myBooks = new Intent(MainActivity.this, MyBooks.class);
                 myBooks.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(myBooks);
+            case R.id.update:
+                Thread thread = new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            checkForUpdates();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                thread.start();
         }
         return true;
     }
@@ -230,5 +265,87 @@ public class MainActivity extends AppCompatActivity
         LinearLayoutManager HorizontalLayout = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(HorizontalLayout);
         recyclerView.setAdapter(adapter);
+    }
+
+    public void checkForUpdates() {
+        try {
+            showSnackBar(root, "Checking for updates");
+            URL url = new URL("https://github.com/kaushalpurohit/Files/blob/master/version.txt?raw=true");
+            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+            String content = in.readLine();
+            if (content.equals(BuildConfig.VERSION_NAME)) {
+                Log.i("Content", "True");
+                showSnackBar(root, "App is up to date!");
+            }
+            else {
+                Log.i("Content", "False");
+                showSnackBar(root, "Downloading update");
+                update();
+            }
+        }
+        catch (Exception e) {
+            Log.i("Content", e.toString());
+        }
+
+    }
+
+    public void showSnackBar(View rootView, String text) {
+        Snackbar snackBar = Snackbar .make(rootView, text, Snackbar.LENGTH_LONG);
+        snackBar.setBackgroundTint(Color.parseColor("#2F0743"));
+        snackBar.setTextColor(Color.WHITE);
+        snackBar.show();
+    }
+
+    public void update() {
+        String url = "https://github.com/kaushalpurohit/Files/blob/master/Bibliophile.apk?raw=true";
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+        OkHttpClient client = new OkHttpClient();
+        try {
+            Response response = client.newCall(request).execute();
+            if (!response.isSuccessful()) {
+                throw new IOException("Failed to download file: " + response);
+            }
+            InputStream inputStream = Objects.requireNonNull(response.body()).byteStream();
+            byte[] buff = new byte[1024 * 4];
+            String fileName = "Bibliophile.apk";
+            String dirPath = Environment.getExternalStorageDirectory() + File.separator + "Books";
+            File file = new File(dirPath);
+            if (!file.exists()) {
+                boolean result = file.mkdirs();
+                Log.i("File", String.valueOf(result));
+            }
+            String path = file.getAbsolutePath();
+            File apk = new File(path, fileName);
+            OutputStream output = new FileOutputStream(apk);
+            while (true) {
+                int read = inputStream.read(buff);
+                if (read == -1) {
+                    break;
+                }
+                output.write(buff, 0, read); // write buff
+            }
+            Log.i("Download", "File written!");
+            output.flush();
+            output.close();
+            showSnackBar(root, "Installing update");
+            Uri packageURI = Uri.parse("Bibliophile");
+            Intent install = new Intent(Intent.ACTION_VIEW, packageURI);
+            Uri uri = FileProvider.getUriForFile(
+                    this,
+                    BuildConfig.APPLICATION_ID +".provider",
+                    apk
+            );
+            install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            install.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            install.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true);
+            Log.i("Download", uri.toString());
+            install.setDataAndType(uri, "application/vnd.android.package-archive");
+            startActivity(install);
+        }
+        catch (Exception e) {
+            Log.i("IOException", e.toString());
+        }
     }
 }
