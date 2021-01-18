@@ -18,4 +18,6 @@
     <string name="about">About</string>
     <string name="edit">Edit</string>
     <string name="done">Done</string>
+    <string name="update">Update</string>
+    <string name="Description">Book downloader</string>
 </resources>

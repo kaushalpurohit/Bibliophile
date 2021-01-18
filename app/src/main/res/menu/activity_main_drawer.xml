@@ -11,5 +11,9 @@
             android:id = "@+id/about"
             android:icon="@drawable/about"
             android:title = "@string/about" />
+        <item
+            android:id="@+id/update"
+            android:icon="@drawable/update"
+            android:title="@string/update"/>
     </group>
 </menu>
