@@ -147,6 +147,7 @@ public class MainActivity extends AppCompatActivity
                 Intent myBooks = new Intent(MainActivity.this, MyBooks.class);
                 myBooks.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(myBooks);
+                break;
             case R.id.update:
                 Thread thread = new Thread() {
                     @Override
@@ -159,6 +160,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 };
                 thread.start();
+                break;
         }
         return true;
     }
