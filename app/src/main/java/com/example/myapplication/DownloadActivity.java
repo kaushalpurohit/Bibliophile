@@ -140,7 +140,7 @@ public class DownloadActivity extends AppCompatActivity {
         ImageView image = findViewById(R.id.download_image);
         image.setOnClickListener(v -> {
             showSnackBar(v, "Please wait");
-            String url = "https://bookdl-api.herokuapp.com/download?url=" + download_url;
+            String url = "http://bookdl-api.herokuapp.com/download?url=" + link;
             Request request = new Request.Builder()
                     .url(url)
                     .build();
@@ -158,6 +158,9 @@ public class DownloadActivity extends AppCompatActivity {
                             try {
                                 JSONObject res = new JSONObject(myResponse);
                                 finalDownloadUrl = res.getString("link");
+                                String id = res.getString("id");
+                                String h = res.getString("h");
+                                finalDownloadUrl = finalDownloadUrl + String.format("?id=%s&h=%s", id, h);
                                 Log.i("finalUrl", finalDownloadUrl);
                                 Intent preview = new Intent(DownloadActivity.this, Preview.class);
                                 preview.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
@@ -311,9 +314,10 @@ public class DownloadActivity extends AppCompatActivity {
         androidx.core.widget.NestedScrollView homeLayout = findViewById(R.id.download_scroll);
         homeLayout.setVisibility(View.VISIBLE);
     }
+
     public void download(View v) {
         showSnackBar(v, "Please wait");
-        String url = "https://bookdl-api.herokuapp.com/download?url=" + download_url;
+        String url = "http://bookdl-api.herokuapp.com/download?url=" + link;
         Request request = new Request.Builder()
                 .url(url)
                 .build();
@@ -331,6 +335,9 @@ public class DownloadActivity extends AppCompatActivity {
                         try {
                             JSONObject res = new JSONObject(myResponse);
                             finalDownloadUrl = res.getString("link");
+                            String id = res.getString("id");
+                            String h = res.getString("h");
+                            finalDownloadUrl = finalDownloadUrl + String.format("?id=%s&h=%s", id, h);
                             Log.i("finalUrl", finalDownloadUrl);
                             DownloadFile myTask = new DownloadFile();
                             myTask.execute(finalDownloadUrl);
@@ -349,7 +356,7 @@ public class DownloadActivity extends AppCompatActivity {
         TextView share = findViewById(R.id.share);
         share.setOnClickListener(v -> {
             showSnackBar(v, "Please wait");
-            String url = "https://bookdl-api.herokuapp.com/download?url=" + download_url;
+            String url = "https://bookdl-api.herokuapp.com/download?url=" + link;
             Request request = new Request.Builder()
                     .url(url)
                     .build();
@@ -367,6 +374,9 @@ public class DownloadActivity extends AppCompatActivity {
                             try {
                                 JSONObject res = new JSONObject(myResponse);
                                 finalDownloadUrl = res.getString("link");
+                                String id = res.getString("id");
+                                String h = res.getString("h");
+                                finalDownloadUrl = finalDownloadUrl + String.format("?id=%s&h=%s", id, h);
                                 Log.i("finalUrl", finalDownloadUrl);
                                 Intent sharingIntent = new Intent(Intent.ACTION_SEND);
                                 sharingIntent.setType("text/plain");
