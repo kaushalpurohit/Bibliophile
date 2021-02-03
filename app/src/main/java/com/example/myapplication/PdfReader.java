@@ -89,6 +89,10 @@ public class PdfReader extends AppCompatActivity implements OnPageChangeListener
                 .enableAnnotationRendering(true)
                 .scrollHandle(new DefaultScrollHandle(this))
                 .pageFling(true)
+                .autoSpacing(true)
+                .pageFitPolicy(FitPolicy.BOTH)
+                .fitEachPage(true)
+                .pageSnap(true)
                 .nightMode(nightMode)
                 .load();
     }
