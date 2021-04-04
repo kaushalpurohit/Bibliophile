@@ -141,7 +141,7 @@ public class MyBookAdapter extends RecyclerView.Adapter<MyBookAdapter.MyCardView
             builder.setMessage("Do you want to delete this book?")
                     .setCancelable(false)
                     .setPositiveButton("Yes", (dialog, id) -> {
-                            String path = Environment.getExternalStorageDirectory() +
+                            String path = mContext.getExternalFilesDir(null).toString() +
                                     File.separator + "Books" + File.separator ;
                             String filePath = path + detailsList.get(position);
                             String imagePath = path + File.separator + "Images" + File.separator +

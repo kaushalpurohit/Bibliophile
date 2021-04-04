@@ -189,7 +189,7 @@ public class DownloadActivity extends AppCompatActivity {
     }
 
     public void checkIfFileExists(){
-        String dirPath = Environment.getExternalStorageDirectory() + File.separator + "Books" ;
+        String dirPath = getExternalFilesDir(null) + File.separator + "Books";;
         dirPath = dirPath + File.separator + title + ".pdf";
         File file = new File(dirPath);
         if (file.exists()) {
@@ -441,7 +441,8 @@ public class DownloadActivity extends AppCompatActivity {
                 extension = extension.substring(extension.indexOf("/") + 1);
                 Log.i("extension", extension);
                 String fileName = title + "." + extension;
-                dirPath = Environment.getExternalStorageDirectory() + File.separator + "Books";
+                dirPath = getExternalFilesDir(null) + File.separator + "Books";;
+                Log.i("File",  dirPath);
                 File file = new File(dirPath);
                 if (!file.exists()) {
                     boolean result = file.mkdirs();

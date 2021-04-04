@@ -33,6 +33,7 @@ public class MyBooks extends AppCompatActivity {
     public ArrayList<String> paths = new ArrayList<>();
     public ArrayList<String> fileName = new ArrayList<>();
     public ArrayList<String> fileList = new ArrayList<>();
+    public String rootPath;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
@@ -41,6 +42,7 @@ public class MyBooks extends AppCompatActivity {
         setContentView(R.layout.activity_my_books);
         Toolbar toolbar = findViewById(R.id.searchToolbar);
         setSupportActionBar(toolbar);
+        rootPath = getExternalFilesDir(null) + File.separator + "Books";
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         AsyncTaskRunner runner = new AsyncTaskRunner();
@@ -124,25 +126,26 @@ public class MyBooks extends AppCompatActivity {
     }
 
     public void listFiles() {
-        File file = new File(Environment.getExternalStorageDirectory() + File.separator + "Books");
+        File file = new File(rootPath);
         String pdfPattern = ".pdf";
         File[] FileList = file.listFiles();
         if (FileList != null) {
             for (File value : FileList) {
 
                 if (value.getName().endsWith(pdfPattern)) {
+                    Log.i("File", value.getName());
                     fileName.add(value.getName());
                     fileList.add(value.getAbsolutePath());
                 }
             }
-            }
+        }
         createImage(fileList, fileName);
     }
 
     public void createImage(List<String> Files, List<String> Names) {
         for (int i = 0; i < Files.size(); i++) {
             try {
-                String path = Environment.getExternalStorageDirectory() + File.separator + "Books" + File.separator + "Images" + File.separator +
+                String path = rootPath + File.separator + "Images" + File.separator +
                         Names.get(i).substring(0,Names.get(i).indexOf('.')) + ".png";
                 File image = new File(path);
                 if(image.exists()) {
@@ -172,8 +175,9 @@ public class MyBooks extends AppCompatActivity {
         }
         Log.i("File", paths.toString());
     }
-    public final static String FOLDER = Environment.getExternalStorageDirectory() + File.separator + "Books" + File.separator + "Images";
     private void saveImage(Bitmap bmp, String name) {
+        String FOLDER = rootPath + File.separator + "Images";
+        Log.i("File", FOLDER);
         FileOutputStream out = null;
         try {
             File folder = new File(FOLDER);
@@ -181,7 +185,7 @@ public class MyBooks extends AppCompatActivity {
                 boolean result = folder.mkdirs();
                 Log.i("File", String.valueOf(result));
             }
-            String path = folder + File.separator + name.substring(0,name.indexOf('.')) + ".png";
+            String path = FOLDER + File.separator + name.substring(0,name.indexOf('.')) + ".png";
             paths.add(Uri.fromFile(new File(path)).toString());
             File file = new File(path);
             out = new FileOutputStream(file);
