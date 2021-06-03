@@ -279,17 +279,18 @@ public class MainActivity extends AppCompatActivity
 
     public void checkForUpdates() {
         try {
-            showSnackBar(root, "Checking for updates");
+            View nav = (View) findViewById(R.id.nav_view);
+            showSnackBar(nav, "Checking for updates");
             URL url = new URL("https://github.com/kaushalpurohit/Files/blob/master/version.txt?raw=true");
             BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
             String content = in.readLine();
             if (content.equals(BuildConfig.VERSION_NAME)) {
                 Log.i("Content", "True");
-                showSnackBar(root, "App is up to date!");
+                showSnackBar(nav, "App is up to date!");
             }
             else {
                 Log.i("Content", "False");
-                showSnackBar(root, "Downloading update");
+                showSnackBar(nav, "Downloading update");
                 update();
             }
         }
